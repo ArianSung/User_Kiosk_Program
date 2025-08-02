@@ -14,6 +14,9 @@ namespace User_Kiosk_Program
 {
     public partial class Page_Default : UserControl
     {
+        // 이벤트 핸들러
+        public event EventHandler ScreenClicked;
+
         // 광고 전환 관련
         private List<string> adImageUrls;
         private int currentAdIndex = -1;
@@ -32,9 +35,21 @@ namespace User_Kiosk_Program
             this.DoubleBuffered = true; // 화면 깜빡임 방지를 위한 더블 버퍼링 활성화
             this.Load += Page_Default_Load;
 
+            this.Load += Page_Default_Load;
+            this.Click += OnScreenClicked;
+            pb_Ad.Click += OnScreenClicked;
+            
+
             fadeTimer.Interval = 25;
             fadeTimer.Tick += FadeTimer_Tick;
         }
+
+        private void OnScreenClicked(object? sender, EventArgs e)
+        {
+            // ScreenClicked 이벤트를 구독한 대상이 있으면 이벤트를 발생시킴
+            ScreenClicked?.Invoke(this, EventArgs.Empty);
+        }
+
 
         private async void Page_Default_Load(object sender, EventArgs e)
         {
