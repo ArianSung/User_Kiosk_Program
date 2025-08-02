@@ -29,7 +29,37 @@ namespace User_Kiosk_Program
             connection = new MySqlConnection(connectionString);
         }
 
-        // Image 파일 가져오기
+        // Page_Select_Stage Webbnner Image
+        public string GetWebBannerImageUrl(string imageKey)
+        {
+            string url = null;
+            string query = "SELECT image_url FROM webbanner_image WHERE image_key = @key LIMIT 1";
+
+            using (MySqlConnection conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@key", imageKey);
+
+                        object result = cmd.ExecuteScalar();
+                        if (result != null)
+                        {
+                            url = result.ToString();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"웹 배너 이미지를 불러오는 중 오류 발생: {ex.Message}", "DB 오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            return url;
+        }
+
+        // Page_Default Ad_Image
         public List<string> GetAdImageUrls()
         {
             List<string> urls = new List<string>();

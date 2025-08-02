@@ -18,9 +18,8 @@ namespace User_Kiosk_Program
         public event EventHandler ScreenClicked;
 
         // 광고 전환 관련
-        private List<string> adImageUrls;
+        private List<Image> adImages;
         private int currentAdIndex = -1;
-        private readonly HttpClient httpClient = new HttpClient();
 
         // 이미지 및 페이드 효과 관련
         private Image currentImage;
@@ -33,9 +32,7 @@ namespace User_Kiosk_Program
         {
             InitializeComponent();
             this.DoubleBuffered = true; // 화면 깜빡임 방지를 위한 더블 버퍼링 활성화
-            this.Load += Page_Default_Load;
 
-            this.Load += Page_Default_Load;
             this.Click += OnScreenClicked;
             pb_Ad.Click += OnScreenClicked;
             
@@ -44,6 +41,24 @@ namespace User_Kiosk_Program
             fadeTimer.Tick += FadeTimer_Tick;
         }
 
+        // MainControl이 호출할 메서드
+        public void StartAds(List<Image> images)
+        {
+            if (images == null || images.Count == 0)
+            {
+                pb_Ad.BackColor = Color.DimGray;
+                return;
+            }
+
+            adImages = images;
+            currentAdIndex = 0;
+            currentImage = adImages[currentAdIndex];
+            pb_Ad.Image = currentImage;
+
+            adChangeTimer.Start();
+        }
+
+
         private void OnScreenClicked(object? sender, EventArgs e)
         {
             // ScreenClicked 이벤트를 구독한 대상이 있으면 이벤트를 발생시킴
@@ -51,113 +66,31 @@ namespace User_Kiosk_Program
         }
 
 
-        private async void Page_Default_Load(object sender, EventArgs e)
+        private void adChangeTimer_Tick(object sender, EventArgs e)
         {
-            await InitializeAds();
-        }
+            if (fadeTimer.Enabled || adImages.Count < 2) return;
 
-        private async Task InitializeAds()
-        {
-            adImageUrls = DatabaseManager.Instance.GetAdImageUrls();
+            currentAdIndex = (currentAdIndex + 1) % adImages.Count;
+            nextImage = adImages[currentAdIndex];
 
-            if (adImageUrls != null && adImageUrls.Count > 0)
-            {
-                currentAdIndex = 0;
-                try
-                {
-                    Image originalImage = await LoadImageAsync(adImageUrls[currentAdIndex]);
-                    currentImage = ResizeImage(originalImage, pb_Ad.Size); // 로드 후 바로 리사이즈
-                    originalImage.Dispose();
-
-                    pb_Ad.Image = currentImage;
-                    adChangeTimer.Start();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Initial image load failed: {ex.Message}");
-                }
-            }
-        }
-
-        private async void adChangeTimer_Tick(object sender, EventArgs e)
-        {
-            if (fadeTimer.Enabled) return;
-
-            currentAdIndex = (currentAdIndex + 1) % adImageUrls.Count;
-
-            try
-            {
-                Image originalImage = await LoadImageAsync(adImageUrls[currentAdIndex]);
-                nextImage = ResizeImage(originalImage, pb_Ad.Size); // 다음 이미지도 미리 리사이즈
-                originalImage.Dispose(); // 원본 이미지는 메모리에서 해제
-
-                fadeStep = 0;
-                fadeTimer.Start();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Next image load failed: {ex.Message}");
-            }
+            fadeStep = 0;
+            fadeTimer.Start();
         }
 
         private void FadeTimer_Tick(object sender, EventArgs e)
         {
             fadeStep++;
             float opacity = (float)fadeStep / FADE_MAX_STEPS;
-
             pb_Ad.Image = BlendImages(currentImage, nextImage, opacity);
-
             if (fadeStep >= FADE_MAX_STEPS)
             {
                 fadeTimer.Stop();
-                currentImage.Dispose(); // 이전 이미지 리소스 해제
+                // 중요: adImages 리스트의 원본 이미지는 MainControl이 관리하므로 Dispose하면 안 됩니다.
+                // currentImage는 이제 다음 nextImage를 가리키게 합니다.
                 currentImage = nextImage;
                 pb_Ad.Image = currentImage;
                 nextImage = null;
             }
-        }
-
-        private async Task<Image> LoadImageAsync(string url)
-        {
-            var imageStream = await httpClient.GetStreamAsync(url);
-            return Image.FromStream(imageStream);
-        }
-
-        private Bitmap ResizeImage(Image sourceImage, Size targetSize)
-        {
-            // 최종 결과물이 될 비트맵을 PictureBox 크기로 생성
-            var resultBitmap = new Bitmap(targetSize.Width, targetSize.Height, PixelFormat.Format32bppArgb);
-            resultBitmap.SetResolution(sourceImage.HorizontalResolution, sourceImage.VerticalResolution);
-
-            using (var g = Graphics.FromImage(resultBitmap))
-            {
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic; // 이미지 품질 설정
-
-                // 'Zoom' 로직 직접 구현
-                float sourceRatio = (float)sourceImage.Width / sourceImage.Height;
-                float targetRatio = (float)targetSize.Width / targetSize.Height;
-                float scaleWidth, scaleHeight;
-
-                if (sourceRatio > targetRatio) // 원본 이미지가 더 넓으면 너비에 맞춤
-                {
-                    scaleWidth = targetSize.Width;
-                    scaleHeight = targetSize.Width / sourceRatio;
-                }
-                else // 원본 이미지가 더 높으면 높이에 맞춤
-                {
-                    scaleHeight = targetSize.Height;
-                    scaleWidth = targetSize.Height * sourceRatio;
-                }
-
-                // 중앙 정렬을 위한 위치 계산
-                float posX = (targetSize.Width - scaleWidth) / 2;
-                float posY = (targetSize.Height - scaleHeight) / 2;
-
-                // 계산된 크기와 위치로 새 비트맵에 원본 이미지를 그림
-                g.DrawImage(sourceImage, posX, posY, scaleWidth, scaleHeight);
-            }
-
-            return resultBitmap;
         }
 
         private Bitmap BlendImages(Image oldImage, Image newImage, float opacity)
