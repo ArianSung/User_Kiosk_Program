@@ -17,6 +17,11 @@ namespace User_Kiosk_Program
                 // 데이터베이스 연결에 실패하면 프로그램을 종료하는 것이 안정적입니다.
                 Application.Exit();
             }
+
+            // MainControl을 폼에 추가
+            MainControl mainControl = new MainControl();
+            mainControl.Dock = DockStyle.Fill;
+            this.Controls.Add(mainControl);
         }
     }
 }

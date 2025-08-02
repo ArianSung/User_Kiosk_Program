@@ -28,17 +28,86 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
+            adChangeTimer = new System.Windows.Forms.Timer(components);
+            pn_Show_Ad = new Panel();
+            pb_Show_Ad_3 = new PictureBox();
+            pb_Show_Ad_2 = new PictureBox();
+            pb_Show_Ad_1 = new PictureBox();
+            pn_Show_Ad.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pb_Show_Ad_3).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pb_Show_Ad_2).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pb_Show_Ad_1).BeginInit();
             SuspendLayout();
+            // 
+            // adChangeTimer
+            // 
+            adChangeTimer.Interval = 5000;
+            adChangeTimer.Tick += adChangeTimer_Tick;
+            // 
+            // pn_Show_Ad
+            // 
+            pn_Show_Ad.Controls.Add(pb_Show_Ad_3);
+            pn_Show_Ad.Controls.Add(pb_Show_Ad_2);
+            pn_Show_Ad.Controls.Add(pb_Show_Ad_1);
+            pn_Show_Ad.Dock = DockStyle.Fill;
+            pn_Show_Ad.Location = new Point(0, 0);
+            pn_Show_Ad.Name = "pn_Show_Ad";
+            pn_Show_Ad.Size = new Size(720, 1020);
+            pn_Show_Ad.TabIndex = 0;
+            // 
+            // pb_Show_Ad_3
+            // 
+            pb_Show_Ad_3.Dock = DockStyle.Fill;
+            pb_Show_Ad_3.Location = new Point(0, 0);
+            pb_Show_Ad_3.Name = "pb_Show_Ad_3";
+            pb_Show_Ad_3.Size = new Size(720, 1020);
+            pb_Show_Ad_3.SizeMode = PictureBoxSizeMode.Zoom;
+            pb_Show_Ad_3.TabIndex = 2;
+            pb_Show_Ad_3.TabStop = false;
+            pb_Show_Ad_3.Visible = false;
+            // 
+            // pb_Show_Ad_2
+            // 
+            pb_Show_Ad_2.Dock = DockStyle.Fill;
+            pb_Show_Ad_2.Location = new Point(0, 0);
+            pb_Show_Ad_2.Name = "pb_Show_Ad_2";
+            pb_Show_Ad_2.Size = new Size(720, 1020);
+            pb_Show_Ad_2.SizeMode = PictureBoxSizeMode.Zoom;
+            pb_Show_Ad_2.TabIndex = 1;
+            pb_Show_Ad_2.TabStop = false;
+            pb_Show_Ad_2.Visible = false;
+            // 
+            // pb_Show_Ad_1
+            // 
+            pb_Show_Ad_1.Dock = DockStyle.Fill;
+            pb_Show_Ad_1.Location = new Point(0, 0);
+            pb_Show_Ad_1.Name = "pb_Show_Ad_1";
+            pb_Show_Ad_1.Size = new Size(720, 1020);
+            pb_Show_Ad_1.SizeMode = PictureBoxSizeMode.Zoom;
+            pb_Show_Ad_1.TabIndex = 0;
+            pb_Show_Ad_1.TabStop = false;
             // 
             // Page_Default
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(pn_Show_Ad);
             Name = "Page_Default";
-            Size = new Size(600, 850);
+            Size = new Size(720, 1020);
+            pn_Show_Ad.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pb_Show_Ad_3).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pb_Show_Ad_2).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pb_Show_Ad_1).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
+
+        private System.Windows.Forms.Timer adChangeTimer;
+        private Panel pn_Show_Ad;
+        private PictureBox pb_Show_Ad_3;
+        private PictureBox pb_Show_Ad_2;
+        private PictureBox pb_Show_Ad_1;
     }
 }
