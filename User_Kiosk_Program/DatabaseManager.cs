@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MySqlConnector;
-
+//
 namespace User_Kiosk_Program
 {
     public class DatabaseManager
