@@ -18,7 +18,7 @@ namespace User_Kiosk_Program
 
         private readonly HttpClient httpClient = new HttpClient();
         private FlowLayoutPanel flp_Menu_Board;
-        private System.Windows.Forms.Timer slideTimer = new System.Windows.Forms.Timer { Interval = 10 };
+        private System.Windows.Forms.Timer slideTimer = new System.Windows.Forms.Timer { Interval = 5 };
         private const int SLIDE_PIXELS_PER_TICK = 50;
 
         public Page_Main()
@@ -55,7 +55,7 @@ namespace User_Kiosk_Program
                 {
                     Text = string.IsNullOrEmpty(category.CategoryName) ? "이름없음" : category.CategoryName,
                     Tag = category.CategoryId,
-                    Size = new Size(120, 60),
+                    Size = new Size(110, 60),
                     Margin = new Padding(5)
                 };
                 btn.Click += CategoryButton_Click;
