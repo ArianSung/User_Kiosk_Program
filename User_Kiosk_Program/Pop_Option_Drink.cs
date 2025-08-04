@@ -25,6 +25,7 @@ namespace User_Kiosk_Program
             lbl_ProductName.Text = product.ProductName;
             lbl_ProductPrice.Text = $"{product.BasePrice:N0}원";
             pb_Select_Image.Image = product.ProductImage; // Page_Main이 미리 로드한 이미지를 바로 사용
+            //lb_Select_Info.Text =
 
             // 2. 받은 Product 객체의 옵션 정보로 동적 컨트롤 생성
             GenerateDynamicControls(product.OptionGroups);
