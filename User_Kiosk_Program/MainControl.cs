@@ -15,11 +15,9 @@ namespace User_Kiosk_Program
         private Page_Select_Stage pageSelectStage;
         private Page_Main pageMain;
 
-        // 팝업 관련 컨트롤들을 MainControl이 직접 관리합니다.
-        private Panel popupOverlay;
+        // optionPopup만 남기고 popupOverlay 필드는 삭제합니다.
         private Pop_Option_Drink optionPopup;
 
-        // 현재 주문 정보를 저장할 변수
         private long currentOrderId = -1;
         private OrderType currentOrderType;
 
@@ -43,7 +41,6 @@ namespace User_Kiosk_Program
         {
             this.Cursor = Cursors.WaitCursor;
 
-            // 모든 페이지 인스턴스를 미리 생성
             pageDefault = new Page_Default();
             pageSelectStage = new Page_Select_Stage();
             pageMain = new Page_Main();
@@ -56,38 +53,27 @@ namespace User_Kiosk_Program
                 page.Visible = false;
             }
 
-            // 팝업 컨트롤들을 여기서 초기화
             InitializePopup();
 
-            // 페이지들의 이벤트 구독
             pageDefault.ScreenClicked += OnDefaultPageScreenClicked;
             pageSelectStage.OrderTypeSelected += OnOrderTypeSelected;
-            pageMain.ProductSelected += OnProductSelected; // Page_Main의 신호 구독
+            pageMain.ProductSelected += OnProductSelected;
 
-            // 첫 페이지 로딩 및 표시
             await LoadDefaultPageData();
             ShowPage(pageDefault);
             this.Cursor = Cursors.Default;
         }
 
-        // Page_Main에서 상품이 클릭되었다는 신호를 받았을 때 실행될 메서드
         private async void OnProductSelected(object sender, ProductSelectedEventArgs e)
         {
             var product = e.SelectedProduct;
-
-            // DB에서 최신 옵션 정보를 가져옵니다.
             product.OptionGroups = await Task.Run(() => DatabaseManager.Instance.GetOptionsForProduct(product.ProductId));
-
-            // MainControl이 직접 팝업을 띄웁니다.
             ShowOptionPopup(product);
         }
 
-        // 팝업 관리 메서드들
+        // 팝업 관리 메서드들 (popupOverlay 관련 코드 모두 삭제)
         private void InitializePopup()
         {
-            popupOverlay = new Panel { BackColor = Color.FromArgb(128, Color.Black), Dock = DockStyle.Fill, Visible = false };
-            this.Controls.Add(popupOverlay);
-
             optionPopup = new Pop_Option_Drink { Visible = false, Size = new Size(600, 720), Location = new Point((this.Width - 600) / 2, (this.Height - 720) / 2), Anchor = AnchorStyles.None };
             this.Controls.Add(optionPopup);
 
@@ -98,19 +84,16 @@ namespace User_Kiosk_Program
         private void ShowOptionPopup(Product product)
         {
             optionPopup.SetProduct(product);
-            popupOverlay.BringToFront();
-            optionPopup.BringToFront();
-            popupOverlay.Visible = true;
+            optionPopup.BringToFront(); // 팝업만 맨 앞으로 가져옵니다.
             optionPopup.Visible = true;
         }
 
         private void HideOptionPopup()
         {
-            popupOverlay.Visible = false;
             optionPopup.Visible = false;
         }
 
-        // 페이지 전환 및 데이터 로딩 로직
+        // 페이지 전환 및 데이터 로딩 로직 (이하 동일)
         private async Task LoadDefaultPageData()
         {
             List<string> adUrls = await Task.Run(() => DatabaseManager.Instance.GetAdImageUrls());

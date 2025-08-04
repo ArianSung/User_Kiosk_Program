@@ -8,11 +8,18 @@ using System.Windows.Forms;
 
 namespace User_Kiosk_Program
 {
-
-    
+    public class ProductSelectedEventArgs : EventArgs
+    {
+        public Product SelectedProduct { get; }
+        public ProductSelectedEventArgs(Product product)
+        {
+            SelectedProduct = product;
+        }
+    }
 
     public partial class Page_Main : UserControl
     {
+        public event EventHandler<ProductSelectedEventArgs> ProductSelected;
 
         private List<Category> categories;
         private Dictionary<int, List<Product>> productsByCategory = new Dictionary<int, List<Product>>();
@@ -25,55 +32,29 @@ namespace User_Kiosk_Program
         private System.Windows.Forms.Timer slideTimer = new System.Windows.Forms.Timer { Interval = 10 };
         private const int SLIDE_PIXELS_PER_TICK = 50;
 
-        private Panel popupOverlay;
-        private Pop_Option_Drink optionPopup;
-
-        public event EventHandler<ProductSelectedEventArgs> ProductSelected;
-
-        
-
         public Page_Main()
         {
             InitializeComponent();
             slideTimer.Tick += SlideTimer_Tick;
             btn_Prev.Click += btn_Prev_Click;
             btn_Next.Click += btn_Next_Click;
-            InitializePopup();
         }
 
         public async void InitializePage(OrderType orderType, long orderId)
         {
             flp_Categories.Controls.Clear();
             pn_BoardContainer.Controls.Clear();
-
             flp_Menu_Board = CreateNewMenuBoard();
             pn_BoardContainer.Controls.Add(flp_Menu_Board);
-
             await LoadAndPrepareData();
-
             if (categories != null && categories.Count > 0)
             {
                 DisplayCategory(categories.First().CategoryId);
             }
         }
 
-        private void InitializePopup()
-        {
-            popupOverlay = new Panel { BackColor = Color.FromArgb(128, Color.Black), Dock = DockStyle.Fill, Visible = false };
-            this.Controls.Add(popupOverlay);
-            popupOverlay.BringToFront();
-
-            optionPopup = new Pop_Option_Drink { Visible = false, Size = new Size(600, 720), Location = new Point((this.Width - 600) / 2, (this.Height - 720) / 2), Anchor = AnchorStyles.None };
-            this.Controls.Add(optionPopup);
-            optionPopup.BringToFront();
-
-            optionPopup.ConfirmClicked += (s, e) => HideOptionPopup();
-            optionPopup.CancelClicked += (s, e) => HideOptionPopup();
-        }
-
         private async Task LoadAndPrepareData()
         {
-            // 1. 카테고리와 상품 정보(URL 포함)를 로드합니다.
             categories = await Task.Run(() => DatabaseManager.Instance.GetCategories());
             foreach (var category in categories)
             {
@@ -83,43 +64,40 @@ namespace User_Kiosk_Program
 
                 var products = await Task.Run(() => DatabaseManager.Instance.GetProductsByCategory(category.CategoryId));
                 productsByCategory[category.CategoryId] = products;
-            }
 
-            // 2. 로드된 모든 상품의 URL을 이용해 이미지를 백그라운드에서 동시에 다운로드 및 리사이징합니다.
-            var imageLoadTasks = new List<Task>();
-            foreach (var product in productsByCategory.Values.SelectMany(p => p))
-            {
-                if (!string.IsNullOrEmpty(product.ProductImageUrl))
+                var imageLoadTasks = new List<Task>();
+                foreach (var product in products)
                 {
-                    imageLoadTasks.Add(Task.Run(async () =>
+                    if (!string.IsNullOrEmpty(product.ProductImageUrl))
                     {
-                        try
+                        imageLoadTasks.Add(Task.Run(async () =>
                         {
-                            var imageStream = await httpClient.GetStreamAsync(product.ProductImageUrl);
-                            var originalImage = Image.FromStream(imageStream);
-                            product.ProductImage = ImageHelper.ResizeImage(originalImage, new Size(125, 140));
-                            originalImage.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Image Error (URL: {product.ProductImageUrl}): {ex.Message}");
-                            product.ProductImage = null;
-                        }
-                    }));
+                            try
+                            {
+                                var imageStream = await httpClient.GetStreamAsync(product.ProductImageUrl);
+                                var originalImage = Image.FromStream(imageStream);
+                                product.ProductImage = ImageHelper.ResizeImage(originalImage, new Size(125, 140));
+                                originalImage.Dispose();
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Image Error (URL: {product.ProductImageUrl}): {ex.Message}");
+                                product.ProductImage = null;
+                            }
+                        }));
+                    }
                 }
+                await Task.WhenAll(imageLoadTasks);
             }
-            await Task.WhenAll(imageLoadTasks);
         }
 
         private void DisplayCategory(int categoryId)
         {
             currentCategoryId = categoryId;
             currentPage = 1;
-
             int totalItems = productsByCategory.ContainsKey(categoryId) ? productsByCategory[categoryId].Count : 0;
             totalPages = (int)Math.Ceiling(totalItems / 9.0);
             if (totalPages == 0) totalPages = 1;
-
             PopulatePanel(flp_Menu_Board);
             UpdatePageInfo();
         }
@@ -128,14 +106,12 @@ namespace User_Kiosk_Program
         {
             panel.Controls.Clear();
             if (!productsByCategory.ContainsKey(currentCategoryId)) return;
-
             var currentProducts = productsByCategory[currentCategoryId].Skip((currentPage - 1) * 9).Take(9).ToList();
-
             foreach (var product in currentProducts)
             {
                 var pn_Menu = new Panel { Size = new Size(150, 170), Margin = new Padding(25, 15, 20, 15), Tag = product };
                 var pb_Image = new PictureBox { Image = product.ProductImage, Size = new Size(125, 140), Dock = DockStyle.Top, SizeMode = PictureBoxSizeMode.StretchImage, BackColor = Color.Gainsboro };
-                var lb_Name = new Label { Text = product.ProductName, Dock = DockStyle.Bottom, TextAlign = System.Drawing.ContentAlignment.MiddleCenter, Height = 40 };
+                var lb_Name = new Label { Text = product.ProductName, Dock = DockStyle.Bottom, TextAlign = System.Drawing.ContentAlignment.MiddleCenter, Height = 30 };
 
                 pn_Menu.Controls.Add(pb_Image);
                 pn_Menu.Controls.Add(lb_Name);
@@ -147,32 +123,14 @@ namespace User_Kiosk_Program
             }
         }
 
-        private async void ProductPanel_Click(object sender, EventArgs e)
+        private void ProductPanel_Click(object sender, EventArgs e)
         {
             var panel = sender as Panel;
             var product = panel.Tag as Product;
             if (product != null)
             {
-                // MainControl에게 "이 상품이 선택되었다"고 신호를 보냅니다.
                 ProductSelected?.Invoke(this, new ProductSelectedEventArgs(product));
             }
-        }
-
-        private void ShowOptionPopup(Product product)
-        {
-            optionPopup.SetProduct(product);
-
-            popupOverlay.BringToFront();
-            optionPopup.BringToFront();
-
-            popupOverlay.Visible = true;
-            optionPopup.Visible = true;
-        }
-
-        private void HideOptionPopup()
-        {
-            popupOverlay.Visible = false;
-            optionPopup.Visible = false;
         }
 
         private void CategoryButton_Click(object sender, EventArgs e)
@@ -211,9 +169,7 @@ namespace User_Kiosk_Program
             flp_Next_Menu_Board.Location = new Point(isNext ? pn_BoardContainer.Width : -pn_BoardContainer.Width, 0);
             pn_BoardContainer.Controls.Add(flp_Next_Menu_Board);
             flp_Next_Menu_Board.BringToFront();
-
             PopulatePanel(flp_Next_Menu_Board);
-
             slideTimer.Tag = new Tuple<FlowLayoutPanel, FlowLayoutPanel, bool>(flp_Menu_Board, flp_Next_Menu_Board, isNext);
             slideTimer.Start();
         }
@@ -224,11 +180,9 @@ namespace User_Kiosk_Program
             var oldPanel = panels.Item1;
             var newPanel = panels.Item2;
             bool isNext = panels.Item3;
-
             int step = SLIDE_PIXELS_PER_TICK;
             oldPanel.Left += isNext ? -step : step;
             newPanel.Left += isNext ? -step : step;
-
             if ((isNext && newPanel.Left <= 0) || (!isNext && newPanel.Left >= 0))
             {
                 slideTimer.Stop();
@@ -238,15 +192,6 @@ namespace User_Kiosk_Program
                 flp_Menu_Board = newPanel;
                 UpdatePageInfo();
             }
-        }
-    }
-
-    public class ProductSelectedEventArgs : EventArgs
-    {
-        public Product SelectedProduct { get; }
-        public ProductSelectedEventArgs(Product product)
-        {
-            SelectedProduct = product;
         }
     }
 }
