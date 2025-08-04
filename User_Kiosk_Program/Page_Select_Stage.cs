@@ -13,7 +13,7 @@ namespace User_Kiosk_Program
 {
     public partial class Page_Select_Stage : UserControl
     {
-
+        public event EventHandler<OrderTypeSelectedEventArgs> OrderTypeSelected;
 
         public Page_Select_Stage()
         {
@@ -37,6 +37,16 @@ namespace User_Kiosk_Program
             }
         }
 
+        private void btn_Store_Click(object sender, EventArgs e)
+        {
+            // OrderType.DineIn 정보를 담아 신호를 보냄
+            OrderTypeSelected?.Invoke(this, new OrderTypeSelectedEventArgs(OrderType.DineIn));
+        }
 
+        private void btn_Pickup_Click(object sender, EventArgs e)
+        {
+            // OrderType.Takeout 정보를 담아 신호를 보냄
+            OrderTypeSelected?.Invoke(this, new OrderTypeSelectedEventArgs(OrderType.Takeout));
+        }
     }
 }

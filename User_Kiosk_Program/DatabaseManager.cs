@@ -1,9 +1,10 @@
-﻿using System;
+﻿using MySqlConnector;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MySqlConnector;
+using System.Windows.Forms.VisualStyles;
 //
 namespace User_Kiosk_Program
 {
@@ -87,6 +88,35 @@ namespace User_Kiosk_Program
                 }
             }
             return urls;
+        }
+
+        public long CreateNewOrder(OrderType orderType)
+        {
+            string query = "INSERT INTO orders (order_type) VALUES (@order_type); SELECT LAST_INSERT_ID();";
+            long newOrderId = -1;
+
+            using (MySqlConnection conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@order_type", orderType.ToString());
+
+                        object result = cmd.ExecuteScalar();
+                        if (result != null)
+                        {
+                            newOrderId = Convert.ToInt64(result);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"새 주문 생성 중 오류 발생: {ex.Message}", "DB 오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            return newOrderId;
         }
 
         public bool TestConnection()

@@ -30,8 +30,8 @@
         {
             pb_WebBanner = new PictureBox();
             pn_Bottom = new Panel();
-            btn_Store = new Button();
             btn_Pickup = new Button();
+            btn_Store = new Button();
             ((System.ComponentModel.ISupportInitialize)pb_WebBanner).BeginInit();
             pn_Bottom.SuspendLayout();
             SuspendLayout();
@@ -53,16 +53,6 @@
             pn_Bottom.Size = new Size(720, 220);
             pn_Bottom.TabIndex = 1;
             // 
-            // btn_Store
-            // 
-            btn_Store.Font = new Font("맑은 고딕", 36F, FontStyle.Bold, GraphicsUnit.Point);
-            btn_Store.Location = new Point(55, 45);
-            btn_Store.Name = "btn_Store";
-            btn_Store.Size = new Size(250, 130);
-            btn_Store.TabIndex = 0;
-            btn_Store.Text = "매장";
-            btn_Store.UseVisualStyleBackColor = true;
-            // 
             // btn_Pickup
             // 
             btn_Pickup.Font = new Font("맑은 고딕", 36F, FontStyle.Bold, GraphicsUnit.Point);
@@ -72,6 +62,18 @@
             btn_Pickup.TabIndex = 0;
             btn_Pickup.Text = "픽업";
             btn_Pickup.UseVisualStyleBackColor = true;
+            btn_Pickup.Click += btn_Pickup_Click;
+            // 
+            // btn_Store
+            // 
+            btn_Store.Font = new Font("맑은 고딕", 36F, FontStyle.Bold, GraphicsUnit.Point);
+            btn_Store.Location = new Point(55, 45);
+            btn_Store.Name = "btn_Store";
+            btn_Store.Size = new Size(250, 130);
+            btn_Store.TabIndex = 0;
+            btn_Store.Text = "매장";
+            btn_Store.UseVisualStyleBackColor = true;
+            btn_Store.Click += btn_Store_Click;
             // 
             // Page_Select_Stage
             // 
