@@ -28,17 +28,75 @@
         /// </summary>
         private void InitializeComponent()
         {
+            pn_BoardContainer = new Panel();
+            btn_Next = new Button();
+            btn_Prev = new Button();
+            lbl_PageInfo = new Label();
+            flp_Categories = new FlowLayoutPanel();
             SuspendLayout();
+            // 
+            // pn_BoardContainer
+            // 
+            pn_BoardContainer.Location = new Point(56, 176);
+            pn_BoardContainer.Name = "pn_BoardContainer";
+            pn_BoardContainer.Size = new Size(600, 640);
+            pn_BoardContainer.TabIndex = 0;
+            // 
+            // btn_Next
+            // 
+            btn_Next.Location = new Point(438, 832);
+            btn_Next.Name = "btn_Next";
+            btn_Next.Size = new Size(75, 23);
+            btn_Next.TabIndex = 1;
+            btn_Next.Text = "button1";
+            btn_Next.UseVisualStyleBackColor = true;
+            // 
+            // btn_Prev
+            // 
+            btn_Prev.Location = new Point(193, 832);
+            btn_Prev.Name = "btn_Prev";
+            btn_Prev.Size = new Size(75, 23);
+            btn_Prev.TabIndex = 2;
+            btn_Prev.Text = "button2";
+            btn_Prev.UseVisualStyleBackColor = true;
+            // 
+            // lbl_PageInfo
+            // 
+            lbl_PageInfo.AutoSize = true;
+            lbl_PageInfo.Location = new Point(332, 836);
+            lbl_PageInfo.Name = "lbl_PageInfo";
+            lbl_PageInfo.Size = new Size(39, 15);
+            lbl_PageInfo.TabIndex = 3;
+            lbl_PageInfo.Text = "label1";
+            // 
+            // flp_Categories
+            // 
+            flp_Categories.Location = new Point(56, 100);
+            flp_Categories.Name = "flp_Categories";
+            flp_Categories.Size = new Size(600, 70);
+            flp_Categories.TabIndex = 4;
             // 
             // Page_Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(flp_Categories);
+            Controls.Add(lbl_PageInfo);
+            Controls.Add(btn_Prev);
+            Controls.Add(btn_Next);
+            Controls.Add(pn_BoardContainer);
             Name = "Page_Main";
             Size = new Size(720, 1020);
             ResumeLayout(false);
+            PerformLayout();
+
         }
 
         #endregion
+        private Panel pn_BoardContainer;
+        private Button btn_Next;
+        private Button btn_Prev;
+        private Label lbl_PageInfo;
+        private FlowLayoutPanel flp_Categories;
     }
 }

@@ -5,65 +5,37 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms.VisualStyles;
+using System.IO;
+using System.Drawing;
 //
 namespace User_Kiosk_Program
 {
     public class DatabaseManager
     {
         private static readonly DatabaseManager instance = new DatabaseManager();
-
         public static DatabaseManager Instance => instance;
-
         private readonly string connectionString;
-        private MySqlConnection connection;
 
         private DatabaseManager()
         {
             // ▼▼▼▼▼ 사용자 환경에 맞게 이 부분을 수정 ▼▼▼▼▼
-            string server = "127.0.0.1"; // MySQL 서버 주소 (로컬이면 127.0.0.1 또는 localhost)
-            string database = "kiosk_project";  // 사용할 데이터베이스 이름
-            string uid = "root";          // MySQL 사용자 ID
-            string password = "123456"; // MySQL 사용자 비밀번호
+            string server = "127.0.0.1";
+            string database = "kiosk_project";  // 사용하시는 데이터베이스 이름으로 변경
+            string uid = "root";
+            string password = "123456"; // 자신의 DB 비밀번호로 변경
             // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
-
             connectionString = $"SERVER={server};DATABASE={database};UID={uid};PASSWORD={password};";
-            connection = new MySqlConnection(connectionString);
         }
 
-        // Page_Select_Stage Webbnner Image
-        public string GetWebBannerImageUrl(string imageKey)
+        public MySqlConnection GetConnection()
         {
-            string url = null;
-            string query = "SELECT image_url FROM webbanner_image WHERE image_key = @key LIMIT 1";
-
-            using (MySqlConnection conn = GetConnection())
-            {
-                try
-                {
-                    conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@key", imageKey);
-
-                        object result = cmd.ExecuteScalar();
-                        if (result != null)
-                        {
-                            url = result.ToString();
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"웹 배너 이미지를 불러오는 중 오류 발생: {ex.Message}", "DB 오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            return url;
+            return new MySqlConnection(connectionString);
         }
 
-        // Page_Default Ad_Image
         public List<string> GetAdImageUrls()
         {
             List<string> urls = new List<string>();
+            // 이 쿼리는 'advertisements' 테이블이 DB에 존재해야 합니다.
             string query = "SELECT image_url FROM advertisements WHERE is_active = TRUE ORDER BY display_order ASC";
 
             using (MySqlConnection conn = GetConnection())
@@ -90,10 +62,11 @@ namespace User_Kiosk_Program
             return urls;
         }
 
-        public long CreateNewOrder(OrderType orderType)
+        public string GetWebBannerImageUrl(string imageKey)
         {
-            string query = "INSERT INTO orders (order_type) VALUES (@order_type); SELECT LAST_INSERT_ID();";
-            long newOrderId = -1;
+            string url = null;
+            // 이 쿼리는 'webbanner_image' 테이블이 DB에 존재해야 합니다.
+            string query = "SELECT image_url FROM webbanner_image WHERE image_key = @key LIMIT 1";
 
             using (MySqlConnection conn = GetConnection())
             {
@@ -102,8 +75,144 @@ namespace User_Kiosk_Program
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@order_type", orderType.ToString());
+                        cmd.Parameters.AddWithValue("@key", imageKey);
+                        object result = cmd.ExecuteScalar();
+                        if (result != null)
+                        {
+                            url = result.ToString();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"웹 배너 이미지를 불러오는 중 오류 발생: {ex.Message}", "DB 오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            return url;
+        }
 
+        public List<Category> GetCategories()
+        {
+            var categories = new List<Category>();
+            string query = "SELECT category_id, category_name FROM categories ORDER BY category_id ASC";
+            using (var conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    using (var cmd = new MySqlCommand(query, conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            categories.Add(new Category
+                            {
+                                CategoryId = reader.GetInt32("category_id"),
+                                CategoryName = reader.GetString("category_name")
+                            });
+                        }
+                    }
+                }
+                catch (Exception ex) { MessageBox.Show($"카테고리 로딩 오류: {ex.Message}"); }
+            }
+            return categories;
+        }
+
+        public List<Product> GetProductsByCategory(int categoryId)
+        {
+            var products = new List<Product>();
+            string query = "SELECT product_id, product_name, base_price, product_image FROM products WHERE category_id = @category_id";
+            using (var conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@category_id", categoryId);
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var product = new Product
+                                {
+                                    ProductId = reader.GetInt32("product_id"),
+                                    ProductName = reader.GetString("product_name"),
+                                    BasePrice = reader.GetDecimal("base_price"),
+                                    // ▼▼▼▼▼ 이 부분을 string으로 읽도록 수정 ▼▼▼▼▼
+                                    ProductImageUrl = reader.IsDBNull(reader.GetOrdinal("product_image")) ? null : reader.GetString("product_image")
+                                };
+                                products.Add(product);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex) { MessageBox.Show($"상품 로딩 오류: {ex.Message}"); }
+            }
+            return products;
+        }
+
+        public List<OptionGroup> GetOptionsForProduct(int productId)
+        {
+            var optionGroups = new List<OptionGroup>();
+            string groupQuery = "SELECT group_id, group_name FROM option_groups WHERE product_id = @product_id ORDER BY display_order";
+
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+                using (var groupCmd = new MySqlCommand(groupQuery, conn))
+                {
+                    groupCmd.Parameters.AddWithValue("@product_id", productId);
+                    using (var groupReader = groupCmd.ExecuteReader())
+                    {
+                        while (groupReader.Read())
+                        {
+                            var group = new OptionGroup
+                            {
+                                GroupId = groupReader.GetInt32("group_id"),
+                                GroupName = groupReader.GetString("group_name")
+                            };
+                            optionGroups.Add(group);
+                        }
+                    }
+                }
+
+                foreach (var group in optionGroups)
+                {
+                    string optionQuery = "SELECT option_id, option_name, additional_price FROM options WHERE group_id = @group_id ORDER BY display_order";
+                    using (var optionCmd = new MySqlCommand(optionQuery, conn))
+                    {
+                        optionCmd.Parameters.AddWithValue("@group_id", group.GroupId);
+                        using (var optionReader = optionCmd.ExecuteReader())
+                        {
+                            while (optionReader.Read())
+                            {
+                                group.Options.Add(new Option
+                                {
+                                    OptionId = optionReader.GetInt32("option_id"),
+                                    OptionName = optionReader.GetString("option_name"),
+                                    AdditionalPrice = optionReader.GetDecimal("additional_price")
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            return optionGroups;
+        }
+
+        public long CreateNewOrder(OrderType orderType)
+        {
+            string query = "INSERT INTO orders (order_type) VALUES (@order_type); SELECT LAST_INSERT_ID();";
+            long newOrderId = -1;
+            using (var conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@order_type", orderType.ToString());
                         object result = cmd.ExecuteScalar();
                         if (result != null)
                         {
@@ -111,41 +220,9 @@ namespace User_Kiosk_Program
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"새 주문 생성 중 오류 발생: {ex.Message}", "DB 오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                catch (Exception ex) { MessageBox.Show($"새 주문 생성 중 오류 발생: {ex.Message}"); }
             }
             return newOrderId;
-        }
-
-        public bool TestConnection()
-        {
-            try
-            {
-                connection.Open();
-                MessageBox.Show("데이터베이스에 성공적으로 연결되었습니다.", "연결 성공", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return true;
-            }
-            catch (MySqlException ex)
-            {
-                MessageBox.Show($"데이터베이스 연결에 실패했습니다: \n{ex.Message}", "연결 오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            finally
-            {
-                if (connection.State == System.Data.ConnectionState.Open)
-                {
-                    connection.Close();
-                }
-            }
-        }
-
-
-
-        public MySqlConnection GetConnection()
-        {
-            return new MySqlConnection(connectionString);
         }
     }
 }
