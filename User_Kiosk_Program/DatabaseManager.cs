@@ -139,7 +139,7 @@ namespace User_Kiosk_Program
                                     ProductId = reader.GetInt32("product_id"),
                                     ProductName = reader.GetString("product_name"),
                                     BasePrice = reader.GetDecimal("base_price"),
-                                    // ▼▼▼▼▼ 이 부분을 string으로 읽도록 수정 ▼▼▼▼▼
+                                    // VARCHAR(URL)를 string으로 읽도록 수정
                                     ProductImageUrl = reader.IsDBNull(reader.GetOrdinal("product_image")) ? null : reader.GetString("product_image")
                                 };
                                 products.Add(product);

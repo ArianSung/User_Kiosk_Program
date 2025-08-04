@@ -15,6 +15,10 @@ namespace User_Kiosk_Program
         private Page_Select_Stage pageSelectStage;
         private Page_Main pageMain;
 
+        // 팝업 관련 컨트롤들을 MainControl이 직접 관리합니다.
+        private Panel popupOverlay;
+        private Pop_Option_Drink optionPopup;
+
         // 현재 주문 정보를 저장할 변수
         private long currentOrderId = -1;
         private OrderType currentOrderType;
@@ -39,54 +43,98 @@ namespace User_Kiosk_Program
         {
             this.Cursor = Cursors.WaitCursor;
 
+            // 모든 페이지 인스턴스를 미리 생성
             pageDefault = new Page_Default();
             pageSelectStage = new Page_Select_Stage();
             pageMain = new Page_Main();
-
             this.Controls.Add(pageDefault);
             this.Controls.Add(pageSelectStage);
             this.Controls.Add(pageMain);
-
             foreach (Control page in this.Controls)
             {
                 page.Dock = DockStyle.Fill;
                 page.Visible = false;
             }
 
-            try
-            {
-                List<Image> adImages = await LoadAdImagesAsync();
-                pageDefault.StartAds(adImages);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"초기 데이터 로딩 실패: {ex.Message}");
-            }
+            // 팝업 컨트롤들을 여기서 초기화
+            InitializePopup();
 
+            // 페이지들의 이벤트 구독
             pageDefault.ScreenClicked += OnDefaultPageScreenClicked;
             pageSelectStage.OrderTypeSelected += OnOrderTypeSelected;
+            pageMain.ProductSelected += OnProductSelected; // Page_Main의 신호 구독
 
+            // 첫 페이지 로딩 및 표시
+            await LoadDefaultPageData();
             ShowPage(pageDefault);
             this.Cursor = Cursors.Default;
+        }
+
+        // Page_Main에서 상품이 클릭되었다는 신호를 받았을 때 실행될 메서드
+        private async void OnProductSelected(object sender, ProductSelectedEventArgs e)
+        {
+            var product = e.SelectedProduct;
+
+            // DB에서 최신 옵션 정보를 가져옵니다.
+            product.OptionGroups = await Task.Run(() => DatabaseManager.Instance.GetOptionsForProduct(product.ProductId));
+
+            // MainControl이 직접 팝업을 띄웁니다.
+            ShowOptionPopup(product);
+        }
+
+        // 팝업 관리 메서드들
+        private void InitializePopup()
+        {
+            popupOverlay = new Panel { BackColor = Color.FromArgb(128, Color.Black), Dock = DockStyle.Fill, Visible = false };
+            this.Controls.Add(popupOverlay);
+
+            optionPopup = new Pop_Option_Drink { Visible = false, Size = new Size(600, 720), Location = new Point((this.Width - 600) / 2, (this.Height - 720) / 2), Anchor = AnchorStyles.None };
+            this.Controls.Add(optionPopup);
+
+            optionPopup.ConfirmClicked += (s, e) => HideOptionPopup();
+            optionPopup.CancelClicked += (s, e) => HideOptionPopup();
+        }
+
+        private void ShowOptionPopup(Product product)
+        {
+            optionPopup.SetProduct(product);
+            popupOverlay.BringToFront();
+            optionPopup.BringToFront();
+            popupOverlay.Visible = true;
+            optionPopup.Visible = true;
+        }
+
+        private void HideOptionPopup()
+        {
+            popupOverlay.Visible = false;
+            optionPopup.Visible = false;
+        }
+
+        // 페이지 전환 및 데이터 로딩 로직
+        private async Task LoadDefaultPageData()
+        {
+            List<string> adUrls = await Task.Run(() => DatabaseManager.Instance.GetAdImageUrls());
+            List<Image> adImages = new List<Image>();
+            foreach (var url in adUrls)
+            {
+                var imageStream = await httpClient.GetStreamAsync(url);
+                var originalImage = Image.FromStream(imageStream);
+                adImages.Add(ImageHelper.ResizeImage(originalImage, pageDefault.Size));
+                originalImage.Dispose();
+            }
+            pageDefault.StartAds(adImages);
         }
 
         private async void OnDefaultPageScreenClicked(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
-            try
+            string bannerUrl = await Task.Run(() => DatabaseManager.Instance.GetWebBannerImageUrl("select_stage_banner"));
+            if (!string.IsNullOrEmpty(bannerUrl))
             {
-                string bannerUrl = DatabaseManager.Instance.GetWebBannerImageUrl("select_stage_banner");
-                if (!string.IsNullOrEmpty(bannerUrl))
-                {
-                    var imageStream = await httpClient.GetStreamAsync(bannerUrl);
-                    Image bannerImage = Image.FromStream(imageStream);
-                    pageSelectStage.SetBannerImage(bannerImage);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"배너 이미지 미리 로딩 실패: {ex.Message}");
-                pageSelectStage.SetBannerImage(null);
+                var imageStream = await httpClient.GetStreamAsync(bannerUrl);
+                var originalImage = Image.FromStream(imageStream);
+                pageSelectStage.SetBannerImage(ImageHelper.ResizeImage(originalImage, pageSelectStage.Size));
+                originalImage.Dispose();
             }
             ShowPage(pageSelectStage);
             this.Cursor = Cursors.Default;
@@ -95,32 +143,23 @@ namespace User_Kiosk_Program
         private async void OnOrderTypeSelected(object sender, OrderTypeSelectedEventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
-
-            // DB에 주문 생성을 요청하고 새로 생성된 order_id를 받아옵니다.
             long newOrderId = await Task.Run(() => DatabaseManager.Instance.CreateNewOrder(e.SelectedOrderType));
 
             if (newOrderId != -1)
             {
-                // 성공 시 현재 주문 정보 저장
                 this.currentOrderId = newOrderId;
                 this.currentOrderType = e.SelectedOrderType;
-
-                Console.WriteLine($"새 주문 생성됨. ID: {this.currentOrderId}, 유형: {this.currentOrderType}");
-
-                // 다음 페이지로 주문 유형과 'orderId'를 함께 전달
                 ShowMainPage(this.currentOrderType, this.currentOrderId);
             }
             else
             {
-                MessageBox.Show("주문 생성에 실패했습니다. 다시 시도해 주세요.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("주문 생성에 실패했습니다.");
             }
-
             this.Cursor = Cursors.Default;
         }
 
         private void ShowMainPage(OrderType orderType, long orderId)
         {
-            // 두 개의 인수를 모두 전달
             pageMain.InitializePage(orderType, orderId);
             ShowPage(pageMain);
         }
@@ -131,24 +170,6 @@ namespace User_Kiosk_Program
             {
                 page.Visible = (page == pageToShow);
             }
-        }
-
-        private async Task<List<Image>> LoadAdImagesAsync()
-        {
-            var images = new List<Image>();
-            List<string> urls = DatabaseManager.Instance.GetAdImageUrls();
-            foreach (var url in urls)
-            {
-                try
-                {
-                    var imageStream = await httpClient.GetStreamAsync(url);
-                    var originalImage = Image.FromStream(imageStream);
-                    images.Add(ImageHelper.ResizeImage(originalImage, pageDefault.Size));
-                    originalImage.Dispose();
-                }
-                catch (Exception ex) { Console.WriteLine($"광고 이미지 로딩 실패 (URL: {url}): {ex.Message}"); }
-            }
-            return images;
         }
     }
 }
