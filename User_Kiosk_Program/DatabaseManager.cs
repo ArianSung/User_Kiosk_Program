@@ -20,9 +20,9 @@ namespace User_Kiosk_Program
         {
             // ▼▼▼▼▼ 사용자 환경에 맞게 이 부분을 수정 ▼▼▼▼▼
             string server = "127.0.0.1"; // MySQL 서버 주소 (로컬이면 127.0.0.1 또는 localhost)
-            string database = "kiosk_db";  // 사용할 데이터베이스 이름
+            string database = "kiosk_project";  // 사용할 데이터베이스 이름
             string uid = "root";          // MySQL 사용자 ID
-            string password = "dytlql1041!"; // MySQL 사용자 비밀번호
+            string password = "123456"; // MySQL 사용자 비밀번호
             // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
             connectionString = $"SERVER={server};DATABASE={database};UID={uid};PASSWORD={password};";

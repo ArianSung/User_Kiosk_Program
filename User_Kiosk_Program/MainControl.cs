@@ -92,17 +92,13 @@ namespace User_Kiosk_Program
 
             try
             {
-                // 다음 페이지에 필요한 데이터를 미리 로드합니다.
                 string bannerUrl = DatabaseManager.Instance.GetWebBannerImageUrl("select_stage_banner");
                 if (!string.IsNullOrEmpty(bannerUrl))
                 {
                     var imageStream = await httpClient.GetStreamAsync(bannerUrl);
-                    var originalImage = Image.FromStream(imageStream);
-                    Image bannerImage = ResizeImage(originalImage, this.Size);
-
-                    // 미리 생성해 둔 인스턴스에 데이터를 전달합니다.
+                    // 원본 배너 이미지를 그대로 전달합니다.
+                    Image bannerImage = Image.FromStream(imageStream);
                     pageSelectStage.SetBannerImage(bannerImage);
-                    originalImage.Dispose();
                 }
             }
             catch (Exception ex)
@@ -125,33 +121,14 @@ namespace User_Kiosk_Program
                 try
                 {
                     var imageStream = await httpClient.GetStreamAsync(url);
-                    var originalImage = Image.FromStream(imageStream);
-                    images.Add(ResizeImage(originalImage, this.Size));
-                    originalImage.Dispose();
+                    // 원본 이미지를 그대로 리스트에 추가합니다.
+                    images.Add(Image.FromStream(imageStream));
                 }
                 catch (Exception ex) { Console.WriteLine($"광고 이미지 로딩 실패 (URL: {url}): {ex.Message}"); }
             }
             return images;
         }
 
-        // 리사이즈 메서드
-        private Bitmap ResizeImage(Image sourceImage, Size targetSize)
-        {
-            var resultBitmap = new Bitmap(targetSize.Width, targetSize.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            resultBitmap.SetResolution(sourceImage.HorizontalResolution, sourceImage.VerticalResolution);
-            using (var g = Graphics.FromImage(resultBitmap))
-            {
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                float sourceRatio = (float)sourceImage.Width / sourceImage.Height;
-                float targetRatio = (float)targetSize.Width / targetSize.Height;
-                float scaleWidth, scaleHeight;
-                if (sourceRatio > targetRatio) { scaleWidth = targetSize.Width; scaleHeight = targetSize.Width / sourceRatio; }
-                else { scaleHeight = targetSize.Height; scaleWidth = targetSize.Height * sourceRatio; }
-                float posX = (targetSize.Width - scaleWidth) / 2;
-                float posY = (targetSize.Height - scaleHeight) / 2;
-                g.DrawImage(sourceImage, posX, posY, scaleWidth, scaleHeight);
-            }
-            return resultBitmap;
-        }
+        
     }
 }

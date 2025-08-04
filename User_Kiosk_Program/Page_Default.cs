@@ -42,20 +42,30 @@ namespace User_Kiosk_Program
         }
 
         // MainControl이 호출할 메서드
-        public void StartAds(List<Image> images)
+        public void StartAds(List<Image> originalImages)
         {
-            if (images == null || images.Count == 0)
+            if (originalImages == null || originalImages.Count == 0)
             {
                 pb_Ad.BackColor = Color.DimGray;
                 return;
             }
 
-            adImages = images;
-            currentAdIndex = 0;
-            currentImage = adImages[currentAdIndex];
-            pb_Ad.Image = currentImage;
+            // 새 리스트를 만들어 리사이즈된 이미지를 저장
+            adImages = new List<Image>();
+            foreach (var img in originalImages)
+            {
+                // ImageHelper를 사용하여 자신의 PictureBox 크기에 맞게 리사이즈
+                adImages.Add(ImageHelper.ResizeImage(img, pb_Ad.Size));
+                img.Dispose(); // 원본 이미지 리소스 해제
+            }
 
-            adChangeTimer.Start();
+            if (adImages.Count > 0)
+            {
+                currentAdIndex = 0;
+                currentImage = adImages[currentAdIndex];
+                pb_Ad.Image = currentImage;
+                adChangeTimer.Start();
+            }
         }
 
 

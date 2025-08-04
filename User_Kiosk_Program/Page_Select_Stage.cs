@@ -27,12 +27,12 @@ namespace User_Kiosk_Program
         {
             if (bannerImage != null)
             {
-                // 이미 완성된 이미지를 받아서 바로 표시
-                pb_WebBanner.Image = bannerImage;
+                // ImageHelper를 사용하여 자신의 PictureBox 크기에 맞게 리사이즈
+                pb_WebBanner.Image = ImageHelper.ResizeImage(bannerImage, pb_WebBanner.Size);
+                bannerImage.Dispose(); // 원본 이미지는 더 이상 필요 없으므로 리소스 해제
             }
             else
             {
-                // 이미지를 받아오지 못한 경우 처리
                 pb_WebBanner.BackColor = Color.DarkGray;
             }
         }
