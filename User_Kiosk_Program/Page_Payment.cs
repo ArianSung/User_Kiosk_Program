@@ -21,19 +21,10 @@ namespace User_Kiosk_Program
             InitializeComponent();
             btn_Back.Click += (s, e) => BackButtonClicked?.Invoke(this, new CartEventArgs(this.currentCart));
 
-            // ▼▼▼▼▼ 변경 부분: '결제하기' 버튼의 클릭 이벤트 핸들러 연결 코드 삭제 ▼▼▼▼▼
-            // btn_Pay.Click += Btn_Pay_Click; // 이 줄을 삭제했습니다.
-            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
         }
 
-        // ▼▼▼▼▼ 변경 부분: '결제하기' 버튼의 이벤트 핸들러 메서드 전체 삭제 ▼▼▼▼▼
-        /*
-        private void Btn_Pay_Click(object sender, EventArgs e)
-        {
-            ...
-        }
-        */
-        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+ 
 
         // MainControl로부터 장바구니 목록을 받아와 화면을 구성하는 메서드
         public async Task PopulateCart(List<OrderItem> shoppingCart)
@@ -50,7 +41,7 @@ namespace User_Kiosk_Program
         private void UpdatePaymentSummary()
         {
             lbl_OrderAmount.Text = $"₩ {this.orderAmount:N0}";
-            lbl_PointsUsed.Text = $"- ₩ {this.pointsUsed:N0}";
+            lbl_PointsUsed.Text = $"₩ {this.pointsUsed:N0}";
             decimal finalAmount = this.orderAmount - this.pointsUsed;
             lbl_FinalAmount.Text = $"₩ {finalAmount:N0}";
         }
@@ -114,11 +105,11 @@ namespace User_Kiosk_Program
                 RenderCartItems();
                 UpdatePaymentSummary();
                 
-                /* 병합 과정에서 충돌
+                
                 // ▼▼▼▼▼ 2. 저장했던 스크롤 위치로 복원 ▼▼▼▼▼
                 flp_Payment_Cart.VerticalScroll.Value = scrollPosition;
                 flp_Payment_Cart.PerformLayout(); // 레이아웃을 즉시 업데이트하여 스크롤 위치 적용
-                */
+
             };
             btnMinus.Click += (s, e) =>
             {
@@ -160,7 +151,7 @@ namespace User_Kiosk_Program
             {
                 var pbox = new PictureBox
                 {
-                    Size = new Size(90, 90),
+                    Size = new Size(100, 90),
                     SizeMode = PictureBoxSizeMode.Zoom,
                     Margin = new Padding(10),
                     BorderStyle = BorderStyle.FixedSingle,
@@ -197,7 +188,11 @@ namespace User_Kiosk_Program
             await Task.WhenAll(imageLoadTasks);
         }
 
-        /* 병합과정에서 겹침
+        /// <summary>
+        /// * 병합과정에서 겹침
+        /// </summary>
+        /// <param name="mainColor"></param>
+        /// <param name="panelColor"></param>
         // 테마세팅
         public void SetTheme(Color mainColor, Color panelColor)
         {
@@ -207,8 +202,6 @@ namespace User_Kiosk_Program
             this.BackColor = panelColor;
         }
         
-        private void label1_Click(object sender, EventArgs e)
-        */
         
         // 결제 방식 PictureBox를 클릭했을 때 호출되는 이벤트 핸들러
         private void PaymentMethod_Click(object sender, EventArgs e)
@@ -229,8 +222,5 @@ namespace User_Kiosk_Program
                 pb_Logo.Image = ImageHelper.ResizeImage(logoImage, pb_Logo.Size);
             }
         }
-
-        private void label1_Click(object sender, EventArgs e) { }
-        private void lbl_OrderAmount_Click(object sender, EventArgs e) { }
     }
 }

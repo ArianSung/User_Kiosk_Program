@@ -109,7 +109,6 @@
             lbl_OrderAmount.TabIndex = 4;
             lbl_OrderAmount.Text = "₩ 0";
             lbl_OrderAmount.TextAlign = ContentAlignment.MiddleLeft;
-            lbl_OrderAmount.Click += lbl_OrderAmount_Click;
             // 
             // label4
             // 
@@ -140,7 +139,6 @@
             label1.Size = new Size(74, 21);
             label1.TabIndex = 0;
             label1.Text = "주문금액";
-            label1.Click += label1_Click;
             // 
             // pb_Logo
             // 

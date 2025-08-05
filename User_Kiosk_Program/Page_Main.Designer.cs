@@ -44,6 +44,7 @@
             // pn_BoardContainer
             // 
             pn_BoardContainer.BackColor = Color.White;
+            pn_BoardContainer.BorderStyle = BorderStyle.Fixed3D;
             pn_BoardContainer.Location = new Point(56, 130);
             pn_BoardContainer.Name = "pn_BoardContainer";
             pn_BoardContainer.Size = new Size(600, 589);
