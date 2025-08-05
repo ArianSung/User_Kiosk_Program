@@ -245,10 +245,10 @@ namespace User_Kiosk_Program
         }
 
         // ▼▼▼▼▼ 참조 오류가 발생한 메서드 이름을 OnProceedToPaymentClicked -> PageMain_ProceedToPaymentClicked로 수정 ▼▼▼▼▼
-        private void OnProceedToPaymentClicked(object sender, CartEventArgs e)
+        private async void OnProceedToPaymentClicked(object sender, CartEventArgs e)
         {
             // 결제 페이지에 장바구니 데이터를 채우고
-            pagePayment.PopulateCart(e.ShoppingCart);
+            await pagePayment.PopulateCart(e.ShoppingCart);
             // 결제 페이지를 화면에 보여줌
             ShowPage(pagePayment);
         }

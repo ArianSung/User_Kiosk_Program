@@ -264,6 +264,38 @@ namespace User_Kiosk_Program
             }
             return newOrderId;
         }
+
+        public List<PaymentMethod> GetPaymentMethods()
+        {
+            var paymentMethods = new List<PaymentMethod>();
+            string query = "SELECT payment_id, payment_name, payment_image FROM payments ORDER BY payment_id ASC";
+
+            using (var conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    using (var cmd = new MySqlCommand(query, conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            paymentMethods.Add(new PaymentMethod
+                            {
+                                PaymentId = reader.GetInt32("payment_id"),
+                                PaymentName = reader.GetString("payment_name"),
+                                PaymentImageUrl = reader.IsDBNull(reader.GetOrdinal("payment_image")) ? "" : reader.GetString("payment_image")
+                            });
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"결제 수단 로딩 오류: {ex.Message}");
+                }
+            }
+            return paymentMethods;
+        }
     }
 }
 

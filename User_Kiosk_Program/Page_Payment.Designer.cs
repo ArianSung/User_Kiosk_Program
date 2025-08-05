@@ -37,8 +37,8 @@
             label4 = new Label();
             label3 = new Label();
             label1 = new Label();
-            btn_Pay = new Button();
             pb_Logo = new PictureBox();
+            fl_Payments = new FlowLayoutPanel();
             panel_PaymentDetails.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pb_Logo).BeginInit();
             SuspendLayout();
@@ -49,7 +49,7 @@
             flp_Payment_Cart.BackColor = Color.White;
             flp_Payment_Cart.BorderStyle = BorderStyle.FixedSingle;
             flp_Payment_Cart.FlowDirection = FlowDirection.TopDown;
-            flp_Payment_Cart.Location = new Point(60, 100);
+            flp_Payment_Cart.Location = new Point(60, 92);
             flp_Payment_Cart.Name = "flp_Payment_Cart";
             flp_Payment_Cart.Size = new Size(600, 650);
             flp_Payment_Cart.TabIndex = 0;
@@ -58,7 +58,7 @@
             // btn_Back
             // 
             btn_Back.Font = new Font("맑은 고딕", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            btn_Back.Location = new Point(60, 30);
+            btn_Back.Location = new Point(15, 13);
             btn_Back.Name = "btn_Back";
             btn_Back.Size = new Size(120, 50);
             btn_Back.TabIndex = 2;
@@ -74,7 +74,7 @@
             panel_PaymentDetails.Controls.Add(label4);
             panel_PaymentDetails.Controls.Add(label3);
             panel_PaymentDetails.Controls.Add(label1);
-            panel_PaymentDetails.Location = new Point(60, 753);
+            panel_PaymentDetails.Location = new Point(60, 745);
             panel_PaymentDetails.Name = "panel_PaymentDetails";
             panel_PaymentDetails.Size = new Size(600, 77);
             panel_PaymentDetails.TabIndex = 3;
@@ -142,16 +142,6 @@
             label1.Text = "주문금액";
             label1.Click += label1_Click;
             // 
-            // btn_Pay
-            // 
-            btn_Pay.Font = new Font("맑은 고딕", 18F, FontStyle.Bold, GraphicsUnit.Point);
-            btn_Pay.Location = new Point(60, 930);
-            btn_Pay.Name = "btn_Pay";
-            btn_Pay.Size = new Size(600, 70);
-            btn_Pay.TabIndex = 4;
-            btn_Pay.Text = "결제하기";
-            btn_Pay.UseVisualStyleBackColor = true;
-            // 
             // pb_Logo
             // 
             pb_Logo.Location = new Point(647, 3);
@@ -160,12 +150,20 @@
             pb_Logo.TabIndex = 12;
             pb_Logo.TabStop = false;
             // 
+            // fl_Payments
+            // 
+            fl_Payments.AutoScroll = true;
+            fl_Payments.Location = new Point(60, 828);
+            fl_Payments.Name = "fl_Payments";
+            fl_Payments.Size = new Size(600, 164);
+            fl_Payments.TabIndex = 13;
+            // 
             // Page_Payment
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(fl_Payments);
             Controls.Add(pb_Logo);
-            Controls.Add(btn_Pay);
             Controls.Add(panel_PaymentDetails);
             Controls.Add(btn_Back);
             Controls.Add(flp_Payment_Cart);
@@ -189,7 +187,7 @@
         private Label label4;
         private Label label3;
         private Label label1;
-        private Button btn_Pay;
         private PictureBox pb_Logo;
+        private FlowLayoutPanel fl_Payments;
     }
 }
