@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace User_Kiosk_Program
@@ -9,40 +11,39 @@ namespace User_Kiosk_Program
     public partial class Page_Payment : UserControl
     {
         public event EventHandler<CartEventArgs> BackButtonClicked;
-
         private List<OrderItem> currentCart;
         private decimal orderAmount = 0;
         private decimal pointsUsed = 0;
+        private readonly HttpClient httpClient = new HttpClient();
 
         public Page_Payment()
         {
             InitializeComponent();
             btn_Back.Click += (s, e) => BackButtonClicked?.Invoke(this, new CartEventArgs(this.currentCart));
 
-            btn_Pay.Click += Btn_Pay_Click;
+            // ▼▼▼▼▼ 변경 부분: '결제하기' 버튼의 클릭 이벤트 핸들러 연결 코드 삭제 ▼▼▼▼▼
+            // btn_Pay.Click += Btn_Pay_Click; // 이 줄을 삭제했습니다.
+            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
         }
 
-        // 결제하기 버튼 클릭 시
+        // ▼▼▼▼▼ 변경 부분: '결제하기' 버튼의 이벤트 핸들러 메서드 전체 삭제 ▼▼▼▼▼
+        /*
         private void Btn_Pay_Click(object sender, EventArgs e)
         {
-            decimal finalAmount = orderAmount - pointsUsed;
-            MessageBox.Show($"₩ {finalAmount:N0}을(를) 결제합니다.", "결제 완료", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            // TODO: 실제 결제 로직 및 영수증 출력 등 추가
+            ...
         }
-
-        // 포인트 적용 버튼 클릭 시
-
+        */
+        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
         // MainControl로부터 장바구니 목록을 받아와 화면을 구성하는 메서드
-        public void PopulateCart(List<OrderItem> shoppingCart)
+        public async Task PopulateCart(List<OrderItem> shoppingCart)
         {
             this.currentCart = shoppingCart;
             this.orderAmount = shoppingCart.Sum(item => item.TotalPrice);
-            this.pointsUsed = 0; // 새 카트를 받으면 포인트 사용 초기화
-
-
+            this.pointsUsed = 0;
             RenderCartItems();
             UpdatePaymentSummary();
+            await LoadPaymentMethodsAsync();
         }
 
         // 결제 금액 관련 UI만 업데이트하는 메서드
@@ -50,7 +51,6 @@ namespace User_Kiosk_Program
         {
             lbl_OrderAmount.Text = $"₩ {this.orderAmount:N0}";
             lbl_PointsUsed.Text = $"- ₩ {this.pointsUsed:N0}";
-
             decimal finalAmount = this.orderAmount - this.pointsUsed;
             lbl_FinalAmount.Text = $"₩ {finalAmount:N0}";
         }
@@ -59,9 +59,7 @@ namespace User_Kiosk_Program
         private void RenderCartItems()
         {
             flp_Payment_Cart.Controls.Clear();
-
             if (currentCart == null) return;
-
             foreach (var item in currentCart)
             {
                 Panel itemPanel = CreateItemPanel(item);
@@ -69,7 +67,7 @@ namespace User_Kiosk_Program
             }
         }
 
-        // 주문 항목 패널 생성 메서드 (이전과 동일, 수량 변경 시 전체 금액 업데이트 로직 추가)
+        // 주문 항목 패널 생성 메서드
         private Panel CreateItemPanel(OrderItem item)
         {
             Panel mainPanel = new Panel
@@ -103,10 +101,8 @@ namespace User_Kiosk_Program
             Label lblPrice = new Label { Text = $"₩ {item.TotalPrice:N0}", Location = new Point(440, 100), Size = new Size(120, 30), Font = new Font("맑은 고딕", 12F, FontStyle.Bold), TextAlign = ContentAlignment.MiddleRight, Anchor = AnchorStyles.Top | AnchorStyles.Right };
             Button btnRemove = new Button { Text = "X", Size = new Size(24, 24), Location = new Point(mainPanel.Width - 30, 5), BackColor = Color.LightCoral, ForeColor = Color.White, FlatStyle = FlatStyle.Flat };
             btnRemove.FlatAppearance.BorderSize = 0;
-
             mainPanel.Controls.AddRange(new Control[] { picProduct, lblProductName, lblOptions, btnMinus, lblQuantity, btnPlus, lblPrice, btnRemove });
-
-
+            
             // 이벤트 핸들러 연결
             btnPlus.Click += (s, e) =>
             {
@@ -117,10 +113,12 @@ namespace User_Kiosk_Program
                 this.orderAmount = currentCart.Sum(i => i.TotalPrice);
                 RenderCartItems();
                 UpdatePaymentSummary();
-
+                
+                /* 병합 과정에서 충돌
                 // ▼▼▼▼▼ 2. 저장했던 스크롤 위치로 복원 ▼▼▼▼▼
                 flp_Payment_Cart.VerticalScroll.Value = scrollPosition;
                 flp_Payment_Cart.PerformLayout(); // 레이아웃을 즉시 업데이트하여 스크롤 위치 적용
+                */
             };
             btnMinus.Click += (s, e) =>
             {
@@ -148,20 +146,58 @@ namespace User_Kiosk_Program
                 RenderCartItems();
                 UpdatePaymentSummary();
             };
-
             return mainPanel;
         }
 
-        public void SetLogo(Image logoImage)
+        // 결제 수단을 동적으로 로드하고 표시하는 메서드
+        private async Task LoadPaymentMethodsAsync()
         {
-            if (logoImage != null && pb_Logo != null)
+            fl_Payments.Controls.Clear();
+            List<PaymentMethod> methods = await Task.Run(() => DatabaseManager.Instance.GetPaymentMethods());
+            var imageLoadTasks = new List<Task>();
+
+            foreach (var method in methods)
             {
-                // ▼▼▼▼▼ 이미 만들어져 있는 ImageHelper.ResizeImage 메서드를 사용합니다 ▼▼▼▼▼
-                pb_Logo.Image = ImageHelper.ResizeImage(logoImage, pb_Logo.Size);
-                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+                var pbox = new PictureBox
+                {
+                    Size = new Size(90, 90),
+                    SizeMode = PictureBoxSizeMode.Zoom,
+                    Margin = new Padding(10),
+                    BorderStyle = BorderStyle.FixedSingle,
+                    BackColor = Color.Gainsboro, // 이미지가 로드되기 전의 배경색
+                    Tag = method,
+                    Cursor = Cursors.Hand
+                };
+
+                // ▼▼▼▼▼ 변경 부분: 임시 텍스트 이미지 생성 로직을 삭제하고, URL 이미지 로드 로직만 남김 ▼▼▼▼▼
+                // DB의 payment_image 필드에 실제 URL이 있다면, 해당 URL에서 이미지를 비동기로 로드합니다.
+                if (!string.IsNullOrEmpty(method.PaymentImageUrl))
+                {
+                    imageLoadTasks.Add(Task.Run(async () =>
+                    {
+                        try
+                        {
+                            var imageStream = await httpClient.GetStreamAsync(method.PaymentImageUrl);
+                            var image = Image.FromStream(imageStream);
+                            method.PaymentImage = image;
+
+                            pbox.Invoke((Action)(() => pbox.Image = ImageHelper.ResizeImage(image, pbox.Size)));
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Payment image load error for {method.PaymentName}: {ex.Message}");
+                        }
+                    }));
+                }
+                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+                pbox.Click += PaymentMethod_Click;
+                fl_Payments.Controls.Add(pbox);
             }
+            await Task.WhenAll(imageLoadTasks);
         }
 
+        /* 병합과정에서 겹침
         // 테마세팅
         public void SetTheme(Color mainColor, Color panelColor)
         {
@@ -170,15 +206,31 @@ namespace User_Kiosk_Program
 
             this.BackColor = panelColor;
         }
-
+        
         private void label1_Click(object sender, EventArgs e)
+        */
+        
+        // 결제 방식 PictureBox를 클릭했을 때 호출되는 이벤트 핸들러
+        private void PaymentMethod_Click(object sender, EventArgs e)
         {
+            var pbox = sender as PictureBox;
+            var method = pbox.Tag as PaymentMethod;
 
+            if (method != null)
+            {
+                MessageBox.Show($"'{method.PaymentName}' 결제 방식을 선택했습니다.", "알림");
+            }
         }
 
-        private void lbl_OrderAmount_Click(object sender, EventArgs e)
+        public void SetLogo(Image logoImage)
         {
-
+            if (logoImage != null && pb_Logo != null)
+            {
+                pb_Logo.Image = ImageHelper.ResizeImage(logoImage, pb_Logo.Size);
+            }
         }
+
+        private void label1_Click(object sender, EventArgs e) { }
+        private void lbl_OrderAmount_Click(object sender, EventArgs e) { }
     }
 }
