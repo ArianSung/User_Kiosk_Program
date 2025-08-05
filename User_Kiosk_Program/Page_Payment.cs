@@ -55,7 +55,7 @@ namespace User_Kiosk_Program
             Panel mainPanel = new Panel
             {
                 Width = 580,
-                Height = 120,
+                Height = 140,
                 Margin = new Padding(0, 0, 0, 5),
                 BorderStyle = BorderStyle.FixedSingle,
                 BackColor = Color.White,
@@ -88,19 +88,20 @@ namespace User_Kiosk_Program
                 Location = new Point(125, 50),
                 Font = new Font("맑은 고딕", 9.75F, FontStyle.Regular, GraphicsUnit.Point),
                 ForeColor = Color.DimGray,
-                AutoSize = true
+                AutoSize = false, // 1. AutoSize를 false로 변경하여 자동 너비 조절을 끕니다.
+                Size = new Size(450, 40) // 2. 라벨의 최대 크기를 지정하여 이 안에서 줄바꿈이 일어나도록 합니다.
             };
 
             // 4. 수량 조절
-            Button btnMinus = new Button { Text = "-", Location = new Point(125, 80), Size = new Size(30, 30) };
-            Label lblQuantity = new Label { Text = item.Quantity.ToString(), Location = new Point(160, 80), Size = new Size(40, 30), Font = new Font("맑은 고딕", 12F, FontStyle.Bold), TextAlign = ContentAlignment.MiddleCenter };
-            Button btnPlus = new Button { Text = "+", Location = new Point(205, 80), Size = new Size(30, 30) };
+            Button btnMinus = new Button { Text = "-", Location = new Point(125, 100), Size = new Size(30, 30) };
+            Label lblQuantity = new Label { Text = item.Quantity.ToString(), Location = new Point(160, 100), Size = new Size(40, 30), Font = new Font("맑은 고딕", 12F, FontStyle.Bold), TextAlign = ContentAlignment.MiddleCenter };
+            Button btnPlus = new Button { Text = "+", Location = new Point(205, 100), Size = new Size(30, 30) };
 
             // 5. 가격
             Label lblPrice = new Label
             {
                 Text = $"₩ {item.TotalPrice:N0}",
-                Location = new Point(440, 80),
+                Location = new Point(440, 100),
                 Size = new Size(120, 30),
                 Font = new Font("맑은 고딕", 12F, FontStyle.Bold, GraphicsUnit.Point),
                 TextAlign = ContentAlignment.MiddleRight,
