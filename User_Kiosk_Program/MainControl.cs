@@ -14,6 +14,7 @@ namespace User_Kiosk_Program
         private Page_Default pageDefault;
         private Page_Select_Stage pageSelectStage;
         private Page_Main pageMain;
+        private Page_Payment pagePayment;
 
         // optionPopup만 남기고 popupOverlay 필드는 삭제합니다.
         private Pop_Option_Drink optionPopup;
@@ -23,6 +24,7 @@ namespace User_Kiosk_Program
 
         private long currentOrderId = -1;
         private OrderType currentOrderType;
+
 
         public MainControl()
         {
@@ -47,10 +49,12 @@ namespace User_Kiosk_Program
             pageDefault = new Page_Default();
             pageSelectStage = new Page_Select_Stage();
             pageMain = new Page_Main();
+            pagePayment = new Page_Payment();
 
             this.Controls.Add(pageDefault);
             this.Controls.Add(pageSelectStage);
             this.Controls.Add(pageMain);
+            this.Controls.Add(pagePayment);
             foreach (Control page in this.Controls)
             {
                 page.Dock = DockStyle.Fill;
@@ -61,13 +65,24 @@ namespace User_Kiosk_Program
 
             pageDefault.ScreenClicked += OnDefaultPageScreenClicked;
             pageSelectStage.OrderTypeSelected += OnOrderTypeSelected;
+            pageMain.ProceedToPaymentClicked += PageMain_ProceedToPaymentClicked;
             pageMain.ProductSelected += OnProductSelected;
+            pagePayment.BackButtonClicked += (s, ev) => ShowPage(pageMain);
 
             await Task.WhenAll(LoadDefaultPageData(), LoadMainPageData());
 
             pageMain.SetInitialData(preloadedCategories, preloadedProducts);
             ShowPage(pageDefault);
             this.Cursor = Cursors.Default;
+        }
+
+        private void PageMain_ProceedToPaymentClicked(object? sender, CartEventArgs e)
+        {
+            // 1. 결제 페이지(UserControl)에 장바구니 데이터를 채워줍니다.
+            pagePayment.PopulateCart(e.ShoppingCart);
+
+            // 2. 결제 페이지를 화면에 보여줍니다.
+            ShowPage(pagePayment);
         }
 
         private async void OnProductSelected(object sender, ProductSelectedEventArgs e)
@@ -204,6 +219,14 @@ namespace User_Kiosk_Program
             {
                 page.Visible = (page == pageToShow);
             }
+        }
+
+        private void OnProceedToPaymentClicked(object sender, CartEventArgs e)
+        {
+            // 결제 페이지에 장바구니 데이터를 채우고
+            pagePayment.PopulateCart(e.ShoppingCart);
+            // 결제 페이지를 화면에 보여줌
+            ShowPage(pagePayment);
         }
     }
 }

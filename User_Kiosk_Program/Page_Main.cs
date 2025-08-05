@@ -9,6 +9,7 @@ namespace User_Kiosk_Program
 {
     public partial class Page_Main : UserControl
     {
+        public event EventHandler<CartEventArgs> ProceedToPaymentClicked;
         public event EventHandler<ProductSelectedEventArgs> ProductSelected;
 
         private List<OrderItem> shoppingCart = new List<OrderItem>();
@@ -33,9 +34,24 @@ namespace User_Kiosk_Program
             slideTimer.Tick += SlideTimer_Tick;
             btn_Prev.Click += btn_Prev_Click;
             btn_Next.Click += btn_Next_Click;
+            btn_GotoPay.Click += Btn_GotoPay_Click;
             flp_Cart.MouseDown += Flp_Cart_MouseDown;
             flp_Cart.MouseMove += Flp_Cart_MouseMove;
             flp_Cart.MouseUp += Flp_Cart_MouseUp;
+        }
+
+        private void Btn_GotoPay_Click(object? sender, EventArgs e)
+        {
+            // 장바구니에 항목이 하나 이상 있을 때만 실행
+            if (shoppingCart.Any())
+            {
+                // MainControl에 장바구니 정보를 담아 이벤트를 보냄
+                ProceedToPaymentClicked?.Invoke(this, new CartEventArgs(this.shoppingCart));
+            }
+            else
+            {
+                MessageBox.Show("장바구니가 비어 있습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         // MainControl로부터 미리 로드된 데이터를 받는 메서드
@@ -84,7 +100,7 @@ namespace User_Kiosk_Program
             flp_Cart.Controls.Clear();
             foreach (var item in shoppingCart)
             {
-                var itemPanel = new Panel { Size = new Size(140, 170), Margin = new Padding(5), BorderStyle = BorderStyle.FixedSingle, Tag = item };
+                var itemPanel = new Panel { Size = new Size(140, 150), Margin = new Padding(5), BorderStyle = BorderStyle.FixedSingle, Tag = item };
                 var pic = new PictureBox { Image = item.BaseProduct.ProductImage, SizeMode = PictureBoxSizeMode.Zoom, Dock = DockStyle.Top, Height = 90 };
                 var btnRemove = new Button { Text = "X", Size = new Size(20, 20), BackColor = Color.LightCoral, ForeColor = Color.White, FlatStyle = FlatStyle.Flat };
                 btnRemove.FlatAppearance.BorderSize = 0;
@@ -259,6 +275,14 @@ namespace User_Kiosk_Program
         public ProductSelectedEventArgs(Product product)
         {
             SelectedProduct = product;
+        }
+    }
+    public class CartEventArgs : EventArgs
+    {
+        public List<OrderItem> ShoppingCart { get; }
+        public CartEventArgs(List<OrderItem> cart)
+        {
+            ShoppingCart = new List<OrderItem>(cart); // 안전하게 복사본을 전달
         }
     }
 }

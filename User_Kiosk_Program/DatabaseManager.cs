@@ -19,9 +19,9 @@ namespace User_Kiosk_Program
         private DatabaseManager()
         {
             // ▼▼▼▼▼ 사용자 환경에 맞게 이 부분을 수정 ▼▼▼▼▼
-            string server = "127.0.0.1";
+            string server = "192.168.0.81";
             string database = "kiosk_project";  // 사용하시는 데이터베이스 이름으로 변경
-            string uid = "root";
+            string uid = "kiosk_user";
             string password = "123456"; // 자신의 DB 비밀번호로 변경
             // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
             connectionString = $"SERVER={server};DATABASE={database};UID={uid};PASSWORD={password};";

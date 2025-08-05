@@ -34,6 +34,7 @@
             btn_Next = new Button();
             btn_Prev = new Button();
             lbl_PageInfo = new Label();
+            btn_GotoPay = new Button();
             SuspendLayout();
             // 
             // pn_BoardContainer
@@ -85,18 +86,32 @@
             lbl_PageInfo.Size = new Size(39, 15);
             lbl_PageInfo.TabIndex = 8;
             lbl_PageInfo.Text = "label1";
+            //
+            // btn_GotoPay
+            //
+            this.btn_GotoPay = new System.Windows.Forms.Button();
+            this.btn_GotoPay.Font = new System.Drawing.Font("맑은 고딕", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.btn_GotoPay.Location = new System.Drawing.Point(546, 940);
+            this.btn_GotoPay.Name = "btn_GotoPay";
+            this.btn_GotoPay.Size = new System.Drawing.Size(110, 60);
+            this.btn_GotoPay.TabIndex = 9;
+            this.btn_GotoPay.Text = "결제하기";
+            this.btn_GotoPay.UseVisualStyleBackColor = true;
             // 
             // Page_Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(btn_GotoPay);
             Controls.Add(btn_Next);
             Controls.Add(btn_Prev);
             Controls.Add(lbl_PageInfo);
             Controls.Add(pn_BoardContainer);
             Controls.Add(flp_Cart);
             Controls.Add(flp_Categories);
-            Name = "Page_Main";
+            this.Controls.Add(this.btn_GotoPay); // 이 줄을 추가하세요.
+            this.Name = "Page_Main";
+           
             Size = new Size(720, 1020);
             ResumeLayout(false);
             PerformLayout();
@@ -110,5 +125,6 @@
         private Button btn_Next;
         private Button btn_Prev;
         private Label lbl_PageInfo;
+        private Button btn_GotoPay;
     }
 }
