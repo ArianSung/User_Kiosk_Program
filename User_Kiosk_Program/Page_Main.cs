@@ -93,6 +93,9 @@ namespace User_Kiosk_Program
         {
             shoppingCart.Add(item);
             UpdateCartView();
+            // UpdateCartView()가 이미 내부적으로 총 금액을 업데이트하므로,
+            // 이 줄은 사실상 생략 가능하지만 명시적으로 남겨둘 수 있습니다.
+            UpdateCartTotalPrice();
         }
 
         private void UpdateCartView()
@@ -122,9 +125,24 @@ namespace User_Kiosk_Program
                 nameLabel.MouseMove += Flp_Cart_MouseMove;
                 nameLabel.MouseUp += Flp_Cart_MouseUp;
 
-                btnPlus.Click += (s, e) => { item.Quantity++; lblQty.Text = item.Quantity.ToString(); };
-                btnMinus.Click += (s, e) => { if (item.Quantity > 1) { item.Quantity--; lblQty.Text = item.Quantity.ToString(); } };
-                btnRemove.Click += (s, e) => { shoppingCart.Remove(item); UpdateCartView(); };
+                // ✨ 버튼 클릭 이벤트 핸들러 안에 총 금액 업데이트 호출 추가
+                btnPlus.Click += (s, e) => {
+                    item.Quantity++;
+                    lblQty.Text = item.Quantity.ToString();
+                    UpdateCartTotalPrice(); // 총 금액 업데이트
+                };
+                btnMinus.Click += (s, e) => {
+                    if (item.Quantity > 1)
+                    {
+                        item.Quantity--;
+                        lblQty.Text = item.Quantity.ToString();
+                        UpdateCartTotalPrice(); // 총 금액 업데이트
+                    }
+                };
+                btnRemove.Click += (s, e) => {
+                    shoppingCart.Remove(item);
+                    UpdateCartView(); // UI를 다시 그리고 총 금액도 다시 계산됨
+                };
 
                 qtyPanel.Controls.Add(btnMinus);
                 qtyPanel.Controls.Add(btnPlus);
@@ -136,6 +154,9 @@ namespace User_Kiosk_Program
                 btnRemove.BringToFront();
                 flp_Cart.Controls.Add(itemPanel);
             }
+
+            // ✨ 모든 UI 변경 후 마지막에 총 금액을 한 번 더 업데이트
+            UpdateCartTotalPrice();
         }
 
         private void DisplayCategory(int categoryId)
@@ -267,6 +288,12 @@ namespace User_Kiosk_Program
                 isTouching = false;
                 flp_Cart.Cursor = Cursors.Default;
             }
+        }
+        private void UpdateCartTotalPrice()
+        {
+            // shoppingCart에 있는 모든 아이템의 TotalPrice를 합산합니다.
+            decimal totalPrice = shoppingCart.Sum(item => item.TotalPrice);
+            lbl_CartTotal.Text = $"총 금액: ₩ {totalPrice:N0}";
         }
     }
     public class ProductSelectedEventArgs : EventArgs

@@ -145,7 +145,9 @@ namespace User_Kiosk_Program
                 }
                 else // 단일 선택만 가능한 그룹일 경우
                 {
-                    // 라디오 버튼처럼 동작: 먼저 그룹 내 모든 버튼을 초기화
+                    bool isAlreadySelected = selectedOptions.ContainsKey(clickedOption.OptionId);
+
+                    // 그룹 내 모든 버튼과 선택 정보를 먼저 초기화
                     foreach (Control c in btn.Parent.Controls)
                     {
                         if (c is Button)
@@ -154,7 +156,6 @@ namespace User_Kiosk_Program
                             ((Button)c).FlatAppearance.BorderColor = Color.LightGray;
                         }
                     }
-                    // 그룹 내 기존 선택 제거
                     var groupOptions = group.Options.Select(opt => opt.OptionId);
                     var selectedKeyToRemove = selectedOptions.Keys.FirstOrDefault(key => groupOptions.Contains(key));
                     if (selectedKeyToRemove != 0)
@@ -162,12 +163,13 @@ namespace User_Kiosk_Program
                         selectedOptions.Remove(selectedKeyToRemove);
                     }
 
-                    // 현재 클릭된 버튼만 선택
-                    btn.BackColor = Color.SkyBlue;
-                    btn.FlatAppearance.BorderColor = Color.DodgerBlue;
-
-                    // 선택된 옵션을 저장 (여기서는 옵션 ID를 키로 사용)
-                    selectedOptions[clickedOption.OptionId] = clickedOption;
+                    // 만약 이전에 선택했던 버튼을 다시 누른게 아니라면, 새로 선택
+                    if (!isAlreadySelected)
+                    {
+                        btn.BackColor = Color.SkyBlue;
+                        btn.FlatAppearance.BorderColor = Color.DodgerBlue;
+                        selectedOptions[clickedOption.OptionId] = clickedOption;
+                    }
                 }
             };
         }

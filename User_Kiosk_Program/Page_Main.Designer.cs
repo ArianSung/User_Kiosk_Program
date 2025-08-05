@@ -97,6 +97,17 @@
             this.btn_GotoPay.TabIndex = 9;
             this.btn_GotoPay.Text = "결제하기";
             this.btn_GotoPay.UseVisualStyleBackColor = true;
+            //
+            // lbl_CartTotal
+            //
+            this.lbl_CartTotal = new System.Windows.Forms.Label();
+            this.lbl_CartTotal.Font = new System.Drawing.Font("맑은 고딕", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_CartTotal.Location = new System.Drawing.Point(56, 940);
+            this.lbl_CartTotal.Name = "lbl_CartTotal";
+            this.lbl_CartTotal.Size = new System.Drawing.Size(480, 60);
+            this.lbl_CartTotal.TabIndex = 10;
+            this.lbl_CartTotal.Text = "총 금액: ₩ 0";
+            this.lbl_CartTotal.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // Page_Main
             // 
@@ -110,6 +121,7 @@
             Controls.Add(flp_Cart);
             Controls.Add(flp_Categories);
             this.Controls.Add(this.btn_GotoPay); // 이 줄을 추가하세요.
+            this.Controls.Add(this.lbl_CartTotal); // 이 줄을 추가하세요.
             this.Name = "Page_Main";
            
             Size = new Size(720, 1020);
@@ -126,5 +138,6 @@
         private Button btn_Prev;
         private Label lbl_PageInfo;
         private Button btn_GotoPay;
+        private Label lbl_CartTotal; // 이 줄을 추가하세요.
     }
 }

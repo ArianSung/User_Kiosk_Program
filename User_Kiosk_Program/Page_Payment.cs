@@ -1,5 +1,4 @@
-﻿// Page_Payment.cs
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -11,150 +10,127 @@ namespace User_Kiosk_Program
     {
         public event EventHandler BackButtonClicked;
 
-        // 장바구니 데이터를 컨트롤 내에서 관리하기 위한 리스트
         private List<OrderItem> currentCart;
+        private decimal orderAmount = 0;
+        private decimal pointsUsed = 0;
 
         public Page_Payment()
         {
             InitializeComponent();
             btn_Back.Click += (s, e) => BackButtonClicked?.Invoke(this, EventArgs.Empty);
+
+            btn_Pay.Click += Btn_Pay_Click;
         }
+
+        // 결제하기 버튼 클릭 시
+        private void Btn_Pay_Click(object sender, EventArgs e)
+        {
+            decimal finalAmount = orderAmount - pointsUsed;
+            MessageBox.Show($"₩ {finalAmount:N0}을(를) 결제합니다.", "결제 완료", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // TODO: 실제 결제 로직 및 영수증 출력 등 추가
+        }
+
+        // 포인트 적용 버튼 클릭 시
+
 
         // MainControl로부터 장바구니 목록을 받아와 화면을 구성하는 메서드
         public void PopulateCart(List<OrderItem> shoppingCart)
         {
             this.currentCart = shoppingCart;
-            RenderCart();
+            this.orderAmount = shoppingCart.Sum(item => item.TotalPrice);
+            this.pointsUsed = 0; // 새 카트를 받으면 포인트 사용 초기화
+
+
+            RenderCartItems();
+            UpdatePaymentSummary();
         }
 
-        // 장바구니의 현재 상태를 기반으로 화면을 다시 그리는 메서드
-        private void RenderCart()
+        // 결제 금액 관련 UI만 업데이트하는 메서드
+        private void UpdatePaymentSummary()
         {
-            flp_Payment_Cart.Controls.Clear(); // 패널 초기화
+            lbl_OrderAmount.Text = $"₩ {this.orderAmount:N0}";
+            lbl_PointsUsed.Text = $"- ₩ {this.pointsUsed:N0}";
 
-            if (currentCart == null || currentCart.Count == 0)
-            {
-                UpdateTotalPrice();
-                return;
-            }
+            decimal finalAmount = this.orderAmount - this.pointsUsed;
+            lbl_FinalAmount.Text = $"₩ {finalAmount:N0}";
+        }
+
+        // 장바구니 항목들만 화면에 다시 그리는 메서드
+        private void RenderCartItems()
+        {
+            flp_Payment_Cart.Controls.Clear();
+
+            if (currentCart == null) return;
 
             foreach (var item in currentCart)
             {
-                // 각 주문 항목에 대한 Panel을 동적으로 생성
                 Panel itemPanel = CreateItemPanel(item);
                 flp_Payment_Cart.Controls.Add(itemPanel);
             }
-
-            UpdateTotalPrice();
         }
 
-        // 주문 항목 하나를 표시할 Panel을 생성하는 메서드
+        // 주문 항목 패널 생성 메서드 (이전과 동일, 수량 변경 시 전체 금액 업데이트 로직 추가)
         private Panel CreateItemPanel(OrderItem item)
         {
-            // 메인 컨테이너 패널
             Panel mainPanel = new Panel
             {
                 Width = 580,
                 Height = 140,
                 Margin = new Padding(0, 0, 0, 5),
-                BorderStyle = BorderStyle.FixedSingle,
+                BorderStyle = BorderStyle.None,
                 BackColor = Color.White,
-                Tag = item // 나중에 참조할 수 있도록 OrderItem 객체를 Tag에 저장
+                Tag = item
             };
-
-            // 1. 상품 이미지
-            PictureBox picProduct = new PictureBox
-            {
-                Image = item.BaseProduct.ProductImage,
-                Location = new Point(15, 15),
-                Size = new Size(90, 90),
-                SizeMode = PictureBoxSizeMode.Zoom
-            };
-
-            // 2. 상품명
-            Label lblProductName = new Label
-            {
-                Text = item.BaseProduct.ProductName,
-                Location = new Point(120, 18),
-                Font = new Font("맑은 고딕", 14.25F, FontStyle.Bold, GraphicsUnit.Point),
-                AutoSize = true
-            };
-
-            // 3. 선택 옵션
+            PictureBox picProduct = new PictureBox { Image = item.BaseProduct.ProductImage, Location = new Point(15, 15), Size = new Size(90, 90), SizeMode = PictureBoxSizeMode.Zoom };
+            Label lblProductName = new Label { Text = item.BaseProduct.ProductName, Location = new Point(120, 18), Font = new Font("맑은 고딕", 14.25F, FontStyle.Bold), AutoSize = true };
             var optionsText = string.Join(", ", item.SelectedOptions.Values.Select(opt => opt.OptionName));
-            Label lblOptions = new Label
-            {
-                Text = "- " + optionsText,
-                Location = new Point(125, 50),
-                Font = new Font("맑은 고딕", 9.75F, FontStyle.Regular, GraphicsUnit.Point),
-                ForeColor = Color.DimGray,
-                AutoSize = false, // 1. AutoSize를 false로 변경하여 자동 너비 조절을 끕니다.
-                Size = new Size(450, 40) // 2. 라벨의 최대 크기를 지정하여 이 안에서 줄바꿈이 일어나도록 합니다.
-            };
-
-            // 4. 수량 조절
+            Label lblOptions = new Label { Text = "- " + optionsText, Location = new Point(125, 50), Font = new Font("맑은 고딕", 9.75F), ForeColor = Color.DimGray, AutoSize = false, Size = new Size(450, 40) };
             Button btnMinus = new Button { Text = "-", Location = new Point(125, 100), Size = new Size(30, 30) };
             Label lblQuantity = new Label { Text = item.Quantity.ToString(), Location = new Point(160, 100), Size = new Size(40, 30), Font = new Font("맑은 고딕", 12F, FontStyle.Bold), TextAlign = ContentAlignment.MiddleCenter };
             Button btnPlus = new Button { Text = "+", Location = new Point(205, 100), Size = new Size(30, 30) };
-
-            // 5. 가격
-            Label lblPrice = new Label
-            {
-                Text = $"₩ {item.TotalPrice:N0}",
-                Location = new Point(440, 100),
-                Size = new Size(120, 30),
-                Font = new Font("맑은 고딕", 12F, FontStyle.Bold, GraphicsUnit.Point),
-                TextAlign = ContentAlignment.MiddleRight,
-                Anchor = AnchorStyles.Top | AnchorStyles.Right
-            };
-
-            // 6. 삭제 버튼
-            Button btnRemove = new Button
-            {
-                Text = "X",
-                Size = new Size(24, 24),
-                Location = new Point(mainPanel.Width - 30, 5),
-                BackColor = Color.LightCoral,
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat
-            };
+            Label lblPrice = new Label { Text = $"₩ {item.TotalPrice:N0}", Location = new Point(440, 100), Size = new Size(120, 30), Font = new Font("맑은 고딕", 12F, FontStyle.Bold), TextAlign = ContentAlignment.MiddleRight, Anchor = AnchorStyles.Top | AnchorStyles.Right };
+            Button btnRemove = new Button { Text = "X", Size = new Size(24, 24), Location = new Point(mainPanel.Width - 30, 5), BackColor = Color.LightCoral, ForeColor = Color.White, FlatStyle = FlatStyle.Flat };
             btnRemove.FlatAppearance.BorderSize = 0;
 
-            
-
-            // 컨트롤들을 메인 패널에 추가
-            mainPanel.Controls.Add(picProduct);
-            mainPanel.Controls.Add(lblProductName);
-            mainPanel.Controls.Add(lblOptions);
-            mainPanel.Controls.Add(btnMinus);
-            mainPanel.Controls.Add(lblQuantity);
-            mainPanel.Controls.Add(btnPlus);
-            mainPanel.Controls.Add(lblPrice);
-            mainPanel.Controls.Add(btnRemove);
-  
+            mainPanel.Controls.AddRange(new Control[] { picProduct, lblProductName, lblOptions, btnMinus, lblQuantity, btnPlus, lblPrice, btnRemove });
 
             // 이벤트 핸들러 연결
-            btnPlus.Click += (s, e) => { item.Quantity++; RenderCart(); };
-            btnMinus.Click += (s, e) => { if (item.Quantity > 1) { item.Quantity--; RenderCart(); } };
-            btnRemove.Click += (s, e) => { currentCart.Remove(item); RenderCart(); };
-            // 옵션 수정 버튼은 추후 기능 구현 필요
-            // btnEditOptions.Click += ...
+            btnPlus.Click += (s, e) =>
+            {
+                item.Quantity++;
+                this.orderAmount = currentCart.Sum(i => i.TotalPrice); // 전체 주문 금액 재계산
+                RenderCartItems();      // 아이템 목록 UI 갱신
+                UpdatePaymentSummary(); // 결제 정보 UI 갱신
+            };
+            btnMinus.Click += (s, e) =>
+            {
+                if (item.Quantity > 1)
+                {
+                    item.Quantity--;
+                    this.orderAmount = currentCart.Sum(i => i.TotalPrice);
+                    RenderCartItems();
+                    UpdatePaymentSummary();
+                }
+            };
+            btnRemove.Click += (s, e) =>
+            {
+                currentCart.Remove(item);
+                this.orderAmount = currentCart.Sum(i => i.TotalPrice);
+                RenderCartItems();
+                UpdatePaymentSummary();
+            };
 
             return mainPanel;
         }
 
-        //총 결제 금액을 업데이트하는 메서드
-        private void UpdateTotalPrice()
+        private void label1_Click(object sender, EventArgs e)
         {
-            if (currentCart != null && currentCart.Any())
-            {
-                decimal totalPrice = currentCart.Sum(item => item.TotalPrice);
-                lbl_TotalPrice.Text = $"총 결제 금액: ₩ {totalPrice:N0}";
-            }
-            else
-            {
-                lbl_TotalPrice.Text = "총 결제 금액: ₩ 0";
-            }
+
+        }
+
+        private void lbl_OrderAmount_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
