@@ -8,7 +8,7 @@ namespace User_Kiosk_Program
 {
     public partial class Page_Payment : UserControl
     {
-        public event EventHandler BackButtonClicked;
+        public event EventHandler<CartEventArgs> BackButtonClicked;
 
         private List<OrderItem> currentCart;
         private decimal orderAmount = 0;
@@ -17,7 +17,7 @@ namespace User_Kiosk_Program
         public Page_Payment()
         {
             InitializeComponent();
-            btn_Back.Click += (s, e) => BackButtonClicked?.Invoke(this, EventArgs.Empty);
+            btn_Back.Click += (s, e) => BackButtonClicked?.Invoke(this, new CartEventArgs(this.currentCart));
 
             btn_Pay.Click += Btn_Pay_Click;
         }

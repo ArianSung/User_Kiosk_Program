@@ -78,7 +78,7 @@ namespace User_Kiosk_Program
             pageSelectStage.OrderTypeSelected += OnOrderTypeSelected;
             pageMain.ProductSelected += OnProductSelected;
             pageMain.ProceedToPaymentClicked += OnProceedToPaymentClicked; // OnProceedToPaymentClicked로 수정
-            pagePayment.BackButtonClicked += (s, ev) => ShowPage(pageMain);
+            pagePayment.BackButtonClicked += PagePayment_BackButtonClicked;
 
             optionPopup.ConfirmClicked += OptionPopup_ConfirmClicked;
             optionPopup.CancelClicked += (s, e) => HideOptionPopup();
@@ -91,6 +91,15 @@ namespace User_Kiosk_Program
 
             ShowPage(pageDefault);
             this.Cursor = Cursors.Default;
+        }
+
+        private void PagePayment_BackButtonClicked(object? sender, CartEventArgs e)
+        {
+            // 1. Page_Payment로부터 받은 최신 장바구니 정보로 Page_Main을 업데이트합니다.
+            pageMain.UpdateShoppingCart(e.ShoppingCart);
+
+            // 2. Page_Main으로 돌아갑니다.
+            ShowPage(pageMain);
         }
 
         private async void OnProductSelected(object sender, ProductSelectedEventArgs e)

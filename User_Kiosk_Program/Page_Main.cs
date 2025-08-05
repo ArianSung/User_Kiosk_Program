@@ -191,6 +191,14 @@ namespace User_Kiosk_Program
             }
         }
 
+        public void UpdateShoppingCart(List<OrderItem> updatedCart)
+        {
+            // 전달받은 최신 장바구니 목록으로 교체합니다.
+            this.shoppingCart = updatedCart;
+            // 변경된 내용으로 장바구니 UI를 다시 그립니다.
+            UpdateCartView();
+        }
+
         private void ProductPanel_Click(object sender, EventArgs e)
         {
             var panel = sender as Panel;
@@ -300,9 +308,7 @@ namespace User_Kiosk_Program
         {
             if (logoImage != null && pb_Logo != null)
             {
-                // ▼▼▼▼▼ 이미 만들어져 있는 ImageHelper.ResizeImage 메서드를 사용합니다 ▼▼▼▼▼
                 pb_Logo.Image = ImageHelper.ResizeImage(logoImage, pb_Logo.Size);
-                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
             }
         }
 
