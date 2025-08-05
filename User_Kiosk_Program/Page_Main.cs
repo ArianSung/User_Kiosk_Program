@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -14,17 +13,16 @@ namespace User_Kiosk_Program
 
         private List<OrderItem> shoppingCart = new List<OrderItem>();
         private List<Category> categories;
-        private Dictionary<int, List<Product>> productsByCategory = new Dictionary<int, List<Product>>();
+        private Dictionary<int, List<Product>> productsByCategory;
+
         private int currentCategoryId = -1;
         private int currentPage = 1;
         private int totalPages = 1;
 
-        // 터치 스크롤 관련 변수
         private bool isTouching = false;
         private Point touchStartPoint;
         private int startScrollOffset;
 
-        private readonly HttpClient httpClient = new HttpClient();
         private FlowLayoutPanel flp_Menu_Board;
         private System.Windows.Forms.Timer slideTimer = new System.Windows.Forms.Timer { Interval = 10 };
         private const int SLIDE_PIXELS_PER_TICK = 50;
@@ -35,11 +33,44 @@ namespace User_Kiosk_Program
             slideTimer.Tick += SlideTimer_Tick;
             btn_Prev.Click += btn_Prev_Click;
             btn_Next.Click += btn_Next_Click;
-
-            // 터치 스크롤 이벤트 핸들러 (MouseEnter/Leave는 제거)
             flp_Cart.MouseDown += Flp_Cart_MouseDown;
             flp_Cart.MouseMove += Flp_Cart_MouseMove;
             flp_Cart.MouseUp += Flp_Cart_MouseUp;
+        }
+
+        // MainControl로부터 미리 로드된 데이터를 받는 메서드
+        public void SetInitialData(List<Category> loadedCategories, Dictionary<int, List<Product>> loadedProducts)
+        {
+            this.categories = loadedCategories;
+            this.productsByCategory = loadedProducts;
+        }
+
+        // InitializePage는 이제 UI 초기화 및 첫 화면 표시에만 집중합니다.
+        public void InitializePage(OrderType orderType, long orderId)
+        {
+            flp_Categories.Controls.Clear();
+            pn_BoardContainer.Controls.Clear();
+            flp_Menu_Board = CreateNewMenuBoard();
+            pn_BoardContainer.Controls.Add(flp_Menu_Board);
+
+            GenerateCategoryButtons();
+
+            if (categories != null && categories.Count > 0)
+            {
+                DisplayCategory(categories.First().CategoryId);
+            }
+        }
+
+        // 카테고리 버튼을 생성하는 로직을 별도 메서드로 분리
+        private void GenerateCategoryButtons()
+        {
+            if (categories == null) return;
+            foreach (var category in categories)
+            {
+                var btn = new Button { Text = string.IsNullOrEmpty(category.CategoryName) ? "이름없음" : category.CategoryName, Tag = category.CategoryId, Size = new Size(110, 60), Margin = new Padding(5) };
+                btn.Click += CategoryButton_Click;
+                flp_Categories.Controls.Add(btn);
+            }
         }
 
         public void AddItemToCart(OrderItem item)
@@ -53,22 +84,27 @@ namespace User_Kiosk_Program
             flp_Cart.Controls.Clear();
             foreach (var item in shoppingCart)
             {
-                // 1. 패널 높이를 170으로 줄여 세로 스크롤 문제 해결
-                var itemPanel = new Panel { Size = new Size(140, 150), Margin = new Padding(5), BorderStyle = BorderStyle.FixedSingle, Tag = item };
-
+                var itemPanel = new Panel { Size = new Size(140, 170), Margin = new Padding(5), BorderStyle = BorderStyle.FixedSingle, Tag = item };
                 var pic = new PictureBox { Image = item.BaseProduct.ProductImage, SizeMode = PictureBoxSizeMode.Zoom, Dock = DockStyle.Top, Height = 90 };
                 var btnRemove = new Button { Text = "X", Size = new Size(20, 20), BackColor = Color.LightCoral, ForeColor = Color.White, FlatStyle = FlatStyle.Flat };
                 btnRemove.FlatAppearance.BorderSize = 0;
                 btnRemove.Location = new Point(itemPanel.Width - btnRemove.Width - 2, 2);
                 btnRemove.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-
-                // 2. 이름 라벨의 Dock을 Fill로 변경하여 위치 문제 해결
                 var nameLabel = new Label { Text = item.BaseProduct.ProductName, Dock = DockStyle.Fill, TextAlign = System.Drawing.ContentAlignment.MiddleCenter };
-
                 var qtyPanel = new Panel { Dock = DockStyle.Bottom, Height = 30 };
                 var btnMinus = new Button { Text = "-", Dock = DockStyle.Left, Width = 30 };
                 var btnPlus = new Button { Text = "+", Dock = DockStyle.Right, Width = 30 };
                 var lblQty = new Label { Text = item.Quantity.ToString(), Dock = DockStyle.Fill, TextAlign = System.Drawing.ContentAlignment.MiddleCenter };
+
+                itemPanel.MouseDown += Flp_Cart_MouseDown;
+                itemPanel.MouseMove += Flp_Cart_MouseMove;
+                itemPanel.MouseUp += Flp_Cart_MouseUp;
+                pic.MouseDown += Flp_Cart_MouseDown;
+                pic.MouseMove += Flp_Cart_MouseMove;
+                pic.MouseUp += Flp_Cart_MouseUp;
+                nameLabel.MouseDown += Flp_Cart_MouseDown;
+                nameLabel.MouseMove += Flp_Cart_MouseMove;
+                nameLabel.MouseUp += Flp_Cart_MouseUp;
 
                 btnPlus.Click += (s, e) => { item.Quantity++; lblQty.Text = item.Quantity.ToString(); };
                 btnMinus.Click += (s, e) => { if (item.Quantity > 1) { item.Quantity--; lblQty.Text = item.Quantity.ToString(); } };
@@ -77,70 +113,12 @@ namespace User_Kiosk_Program
                 qtyPanel.Controls.Add(btnMinus);
                 qtyPanel.Controls.Add(btnPlus);
                 qtyPanel.Controls.Add(lblQty);
-
-                // 컨트롤 추가 순서 변경
-                itemPanel.Controls.Add(nameLabel); // Fill 속성인 라벨을 먼저 추가
+                itemPanel.Controls.Add(nameLabel);
                 itemPanel.Controls.Add(pic);
-                itemPanel.Controls.Add(btnRemove);
                 itemPanel.Controls.Add(qtyPanel);
-
-                // 삭제 버튼을 최상위로
+                itemPanel.Controls.Add(btnRemove);
                 btnRemove.BringToFront();
-
                 flp_Cart.Controls.Add(itemPanel);
-            }
-        }
-
-        // ... (InitializePage, LoadAndPrepareData 등 이하 모든 코드는 이전과 동일)
-
-        public async void InitializePage(OrderType orderType, long orderId)
-        {
-            flp_Categories.Controls.Clear();
-            pn_BoardContainer.Controls.Clear();
-            flp_Menu_Board = CreateNewMenuBoard();
-            pn_BoardContainer.Controls.Add(flp_Menu_Board);
-            await LoadAndPrepareData();
-            if (categories != null && categories.Count > 0)
-            {
-                DisplayCategory(categories.First().CategoryId);
-            }
-        }
-
-        private async Task LoadAndPrepareData()
-        {
-            categories = await Task.Run(() => DatabaseManager.Instance.GetCategories());
-            foreach (var category in categories)
-            {
-                var btn = new Button { Text = string.IsNullOrEmpty(category.CategoryName) ? "이름없음" : category.CategoryName, Tag = category.CategoryId, Size = new Size(110, 60), Margin = new Padding(5) };
-                btn.Click += CategoryButton_Click;
-                flp_Categories.Controls.Add(btn);
-
-                var products = await Task.Run(() => DatabaseManager.Instance.GetProductsByCategory(category.CategoryId));
-                productsByCategory[category.CategoryId] = products;
-
-                var imageLoadTasks = new List<Task>();
-                foreach (var product in products)
-                {
-                    if (!string.IsNullOrEmpty(product.ProductImageUrl))
-                    {
-                        imageLoadTasks.Add(Task.Run(async () =>
-                        {
-                            try
-                            {
-                                var imageStream = await httpClient.GetStreamAsync(product.ProductImageUrl);
-                                var originalImage = Image.FromStream(imageStream);
-                                product.ProductImage = ImageHelper.ResizeImage(originalImage, new Size(125, 140));
-                                originalImage.Dispose();
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Image Error (URL: {product.ProductImageUrl}): {ex.Message}");
-                                product.ProductImage = null;
-                            }
-                        }));
-                    }
-                }
-                await Task.WhenAll(imageLoadTasks);
             }
         }
 

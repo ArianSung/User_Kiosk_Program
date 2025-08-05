@@ -18,6 +18,9 @@ namespace User_Kiosk_Program
         // optionPopup만 남기고 popupOverlay 필드는 삭제합니다.
         private Pop_Option_Drink optionPopup;
 
+        private List<Category> preloadedCategories;
+        private Dictionary<int, List<Product>> preloadedProducts;
+
         private long currentOrderId = -1;
         private OrderType currentOrderType;
 
@@ -44,6 +47,7 @@ namespace User_Kiosk_Program
             pageDefault = new Page_Default();
             pageSelectStage = new Page_Select_Stage();
             pageMain = new Page_Main();
+
             this.Controls.Add(pageDefault);
             this.Controls.Add(pageSelectStage);
             this.Controls.Add(pageMain);
@@ -59,7 +63,9 @@ namespace User_Kiosk_Program
             pageSelectStage.OrderTypeSelected += OnOrderTypeSelected;
             pageMain.ProductSelected += OnProductSelected;
 
-            await LoadDefaultPageData();
+            await Task.WhenAll(LoadDefaultPageData(), LoadMainPageData());
+
+            pageMain.SetInitialData(preloadedCategories, preloadedProducts);
             ShowPage(pageDefault);
             this.Cursor = Cursors.Default;
         }
@@ -115,6 +121,42 @@ namespace User_Kiosk_Program
                 originalImage.Dispose();
             }
             pageDefault.StartAds(adImages);
+        }
+
+        private async Task LoadMainPageData()
+        {
+            preloadedCategories = await Task.Run(() => DatabaseManager.Instance.GetCategories());
+            preloadedProducts = new Dictionary<int, List<Product>>();
+
+            foreach (var category in preloadedCategories)
+            {
+                var products = await Task.Run(() => DatabaseManager.Instance.GetProductsByCategory(category.CategoryId));
+                preloadedProducts[category.CategoryId] = products;
+            }
+
+            var imageLoadTasks = new List<Task>();
+            foreach (var product in preloadedProducts.Values.SelectMany(p => p))
+            {
+                if (!string.IsNullOrEmpty(product.ProductImageUrl))
+                {
+                    imageLoadTasks.Add(Task.Run(async () =>
+                    {
+                        try
+                        {
+                            var imageStream = await httpClient.GetStreamAsync(product.ProductImageUrl);
+                            var originalImage = Image.FromStream(imageStream);
+                            product.ProductImage = ImageHelper.ResizeImage(originalImage, new Size(125, 140));
+                            originalImage.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Image Error (URL: {product.ProductImageUrl}): {ex.Message}");
+                            product.ProductImage = null;
+                        }
+                    }));
+                }
+            }
+            await Task.WhenAll(imageLoadTasks);
         }
 
         private async void OnDefaultPageScreenClicked(object sender, EventArgs e)
