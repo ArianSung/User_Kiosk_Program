@@ -37,6 +37,7 @@
             btn_GotoPay = new Button();
             lbl_CartTotal = new Label();
             pb_Logo = new PictureBox();
+            btn_Home = new Button();
             ((System.ComponentModel.ISupportInitialize)pb_Logo).BeginInit();
             SuspendLayout();
             // 
@@ -120,10 +121,27 @@
             pb_Logo.TabIndex = 11;
             pb_Logo.TabStop = false;
             // 
+            // btn_Home
+            // 
+            btn_Home.BackColor = Color.Transparent;
+            btn_Home.FlatAppearance.BorderSize = 0;
+            btn_Home.FlatAppearance.MouseDownBackColor = Color.Transparent;
+            btn_Home.FlatAppearance.MouseOverBackColor = Color.Transparent;
+            btn_Home.FlatStyle = FlatStyle.Flat;
+            btn_Home.Font = new Font("맑은 고딕", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
+            btn_Home.ForeColor = Color.White;
+            btn_Home.Location = new Point(3, 3);
+            btn_Home.Name = "btn_Home";
+            btn_Home.Size = new Size(70, 70);
+            btn_Home.TabIndex = 12;
+            btn_Home.Text = "HOME";
+            btn_Home.UseVisualStyleBackColor = false;
+            // 
             // Page_Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(btn_Home);
             Controls.Add(btn_Next);
             Controls.Add(btn_Prev);
             Controls.Add(lbl_PageInfo);
@@ -151,5 +169,6 @@
         private Button btn_GotoPay;
         private Label lbl_CartTotal; // 이 줄을 추가하세요.
         private PictureBox pb_Logo;
+        private Button btn_Home;
     }
 }

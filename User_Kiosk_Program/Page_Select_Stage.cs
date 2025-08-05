@@ -48,5 +48,10 @@ namespace User_Kiosk_Program
             // OrderType.Takeout 정보를 담아 신호를 보냄
             OrderTypeSelected?.Invoke(this, new OrderTypeSelectedEventArgs(OrderType.Takeout));
         }
+        public void SetTheme(Color mainColor, Color panelColor)
+        {
+
+            this.BackColor = panelColor;
+        }
     }
 }

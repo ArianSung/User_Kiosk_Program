@@ -81,6 +81,7 @@ namespace User_Kiosk_Program
             pageMain.ProductSelected += OnProductSelected;
             pageMain.ProceedToPaymentClicked += OnProceedToPaymentClicked; // OnProceedToPaymentClicked로 수정
             pagePayment.BackButtonClicked += PagePayment_BackButtonClicked;
+            pageMain.HomeButtonClicked += (s, e) => ShowPage(pageSelectStage);
 
             optionPopup.ConfirmClicked += OptionPopup_ConfirmClicked;
             optionPopup.CancelClicked += (s, e) => HideOptionPopup();
@@ -106,6 +107,7 @@ namespace User_Kiosk_Program
             // 각 페이지에 만들어 둘 SetTheme 메서드를 호출
             pageMain.SetTheme(mainThemeColor, panelBackgroundColor);
             pagePayment.SetTheme(mainThemeColor, panelBackgroundColor);
+            pageSelectStage.SetTheme(mainThemeColor, panelBackgroundColor);
             //pageSelectStage.SetTheme(mainThemeColor, panelBackgroundColor);
             // ... 다른 페이지들도 동일하게 추가 ...
         }

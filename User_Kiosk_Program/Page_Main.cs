@@ -11,6 +11,7 @@ namespace User_Kiosk_Program
     {
         public event EventHandler<CartEventArgs> ProceedToPaymentClicked;
         public event EventHandler<ProductSelectedEventArgs> ProductSelected;
+        public event EventHandler HomeButtonClicked;
 
         private List<OrderItem> shoppingCart = new List<OrderItem>();
         private List<Category> categories;
@@ -38,6 +39,7 @@ namespace User_Kiosk_Program
             flp_Cart.MouseDown += Flp_Cart_MouseDown;
             flp_Cart.MouseMove += Flp_Cart_MouseMove;
             flp_Cart.MouseUp += Flp_Cart_MouseUp;
+            btn_Home.Click += (s, e) => HomeButtonClicked?.Invoke(this, EventArgs.Empty);
         }
 
         private void Btn_GotoPay_Click(object? sender, EventArgs e)
@@ -316,8 +318,13 @@ namespace User_Kiosk_Program
         // 테마세팅
         public void SetTheme(Color mainColor, Color panelColor)
         {
-           
-            btn_GotoPay.BackColor = mainColor;
+            btn_Next.BackColor = Color.White;
+            btn_Prev.BackColor = Color.White;
+
+            btn_GotoPay.FlatStyle = FlatStyle.Flat;
+            btn_GotoPay.FlatAppearance.BorderSize = 0;
+            btn_GotoPay.BackColor = Color.White;
+
 
             this.BackColor = panelColor;
         }
