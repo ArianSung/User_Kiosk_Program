@@ -19,6 +19,7 @@ namespace User_Kiosk_Program
         private Image appLogo;
         private Color mainThemeColor;
         private Color panelBackgroundColor;
+        private Pop_Use_Point pointsPopup;
 
         private Pop_Option_Drink optionPopup;
 
@@ -55,16 +56,19 @@ namespace User_Kiosk_Program
             pageSelectStage = new Page_Select_Stage();
             pageMain = new Page_Main();
             pagePayment = new Page_Payment();
+            pointsPopup = new Pop_Use_Point();
 
             this.Controls.Add(pageDefault);
             this.Controls.Add(pageSelectStage);
             this.Controls.Add(pageMain);
             this.Controls.Add(pagePayment);
 
+
             InitializePopup();
             // 팝업 컨트롤은 다른 페이지들과 달리 Dock.Fill을 사용하지 않으므로,
             // Controls 컬렉션에 나중에 추가하는 것이 좋습니다.
             this.Controls.Add(optionPopup);
+            this.Controls.Add(pointsPopup);
 
             foreach (Control page in this.Controls)
             {
@@ -82,9 +86,13 @@ namespace User_Kiosk_Program
             pageMain.ProceedToPaymentClicked += OnProceedToPaymentClicked; // OnProceedToPaymentClicked로 수정
             pagePayment.BackButtonClicked += PagePayment_BackButtonClicked;
             pageMain.HomeButtonClicked += (s, e) => ShowPage(pageSelectStage);
+            pagePayment.PointPaymentClicked += OnPayment_PointPaymentClicked;
+            pagePayment.BackButtonClicked += OnPayment_BackButtonClicked;
 
             optionPopup.ConfirmClicked += OptionPopup_ConfirmClicked;
             optionPopup.CancelClicked += (s, e) => HideOptionPopup();
+            pointsPopup.ApplyClicked += OnPointsApplied;
+            pointsPopup.CancelClicked += (s, e) => HidePointsPopup();
 
             await Task.WhenAll(LoadThemeColorsAsync(), LoadSharedResourcesAsync(), LoadDefaultPageData(), LoadMainPageData());
 
@@ -95,6 +103,37 @@ namespace User_Kiosk_Program
 
             ShowPage(pageDefault);
             this.Cursor = Cursors.Default;
+        }
+
+        private void OnPayment_BackButtonClicked(object? sender, CartEventArgs e)
+        {
+            pageMain.UpdateShoppingCart(e.ShoppingCart);
+            ShowPage(pageMain);
+        }
+
+        private void OnPayment_PointPaymentClicked(object? sender, decimal orderAmount)
+        {
+            pointsPopup.Initialize(orderAmount);
+            ShowPointsPopup();
+        }
+
+        private void OnPointsApplied(object? sender, PointUsageEventArgs e)
+        {
+            // Page_Payment에 포인트를 적용하도록 지시
+            pagePayment.ApplyPoints(e.PointsToUse);
+            // 팝업 닫기
+            HidePointsPopup();
+        }
+
+        private void ShowPointsPopup()
+        {
+            pointsPopup.BringToFront();
+            pointsPopup.Visible = true;
+        }
+
+        private void HidePointsPopup()
+        {
+            pointsPopup.Visible = false;
         }
 
         private async Task LoadThemeColorsAsync()
@@ -131,7 +170,13 @@ namespace User_Kiosk_Program
 
         private void InitializePopup()
         {
+            // 기존 옵션 팝업 생성
             optionPopup = new Pop_Option_Drink { Visible = false, Size = new Size(600, 720), Location = new Point((this.Width - 600) / 2, (this.Height - 720) / 2), Anchor = AnchorStyles.None };
+            this.Controls.Add(optionPopup);
+
+            // 포인트 팝업 생성 로직 추가
+            pointsPopup = new Pop_Use_Point { Visible = false, Size = new Size(600, 850), Location = new Point((this.Width - 600) / 2, (this.Height - 850) / 2), Anchor = AnchorStyles.None };
+            this.Controls.Add(pointsPopup);
         }
 
         private void OptionPopup_ConfirmClicked(object sender, OrderItemEventArgs e)

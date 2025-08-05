@@ -328,6 +328,39 @@ namespace User_Kiosk_Program
             }
             return paymentMethods;
         }
+
+        public Member GetMemberByPhoneNumber(string phoneNumber)
+        {
+            Member member = null;
+            string query = "SELECT Phone_Number, Point FROM members WHERE Phone_Number = @phone";
+            using (var conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@phone", phoneNumber);
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                member = new Member
+                                {
+                                    PhoneNumber = reader.GetString("Phone_Number"),
+                                    Point = reader.GetDecimal("Point")
+                                };
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"회원 정보 조회 오류: {ex.Message}");
+                }
+            }
+            return member;
+        }
     }
 }
 

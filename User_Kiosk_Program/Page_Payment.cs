@@ -11,6 +11,8 @@ namespace User_Kiosk_Program
     public partial class Page_Payment : UserControl
     {
         public event EventHandler<CartEventArgs> BackButtonClicked;
+        public event EventHandler<decimal> PointPaymentClicked;
+
         private List<OrderItem> currentCart;
         private decimal orderAmount = 0;
         private decimal pointsUsed = 0;
@@ -21,10 +23,7 @@ namespace User_Kiosk_Program
             InitializeComponent();
             btn_Back.Click += (s, e) => BackButtonClicked?.Invoke(this, new CartEventArgs(this.currentCart));
 
-
         }
-
- 
 
         // MainControl로부터 장바구니 목록을 받아와 화면을 구성하는 메서드
         public async Task PopulateCart(List<OrderItem> shoppingCart)
@@ -40,10 +39,18 @@ namespace User_Kiosk_Program
         // 결제 금액 관련 UI만 업데이트하는 메서드
         private void UpdatePaymentSummary()
         {
+            this.orderAmount = currentCart.Sum(item => item.TotalPrice);
             lbl_OrderAmount.Text = $"₩ {this.orderAmount:N0}";
             lbl_PointsUsed.Text = $"₩ {this.pointsUsed:N0}";
             decimal finalAmount = this.orderAmount - this.pointsUsed;
             lbl_FinalAmount.Text = $"₩ {finalAmount:N0}";
+        }
+
+        // MainControl이 호출할, 포인트를 적용하는 공개 메서드
+        public void ApplyPoints(decimal pointsToUse)
+        {
+            this.pointsUsed = Math.Min(this.orderAmount, pointsToUse);
+            UpdatePaymentSummary();
         }
 
         // 장바구니 항목들만 화면에 다시 그리는 메서드
@@ -208,10 +215,16 @@ namespace User_Kiosk_Program
         {
             var pbox = sender as PictureBox;
             var method = pbox.Tag as PaymentMethod;
-
             if (method != null)
             {
-                MessageBox.Show($"'{method.PaymentName}' 결제 방식을 선택했습니다.", "알림");
+                if (method.PaymentName.ToLower() == "point")
+                {
+                    PointPaymentClicked?.Invoke(this, this.orderAmount);
+                }
+                else
+                {
+                    MessageBox.Show($"'{method.PaymentName}' 결제 방식을 선택했습니다.", "알림");
+                }
             }
         }
 
