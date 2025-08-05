@@ -78,8 +78,6 @@
 
         private System.Windows.Forms.Timer adChangeTimer;
         private Panel pn_Show_Ad;
-        private PictureBox pb_Show_Ad_3;
-        private PictureBox pb_Show_Ad_2;
         private PictureBox pb_Ad;
         private System.Windows.Forms.Timer fade_Timer;
     }

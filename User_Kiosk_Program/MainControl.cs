@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,12 +16,14 @@ namespace User_Kiosk_Program
         private Page_Select_Stage pageSelectStage;
         private Page_Main pageMain;
         private Page_Payment pagePayment;
+        private Image appLogo;
 
-        // optionPopup만 남기고 popupOverlay 필드는 삭제합니다.
         private Pop_Option_Drink optionPopup;
 
         private List<Category> preloadedCategories;
         private Dictionary<int, List<Product>> preloadedProducts;
+        // ▼▼▼▼▼ 오류가 발생한 변수 대신 이 변수를 사용합니다 ▼▼▼▼▼
+        private List<Image> preloadedAdImages = new List<Image>();
 
         private long currentOrderId = -1;
         private OrderType currentOrderType;
@@ -55,34 +58,39 @@ namespace User_Kiosk_Program
             this.Controls.Add(pageSelectStage);
             this.Controls.Add(pageMain);
             this.Controls.Add(pagePayment);
-            foreach (Control page in this.Controls)
-            {
-                page.Dock = DockStyle.Fill;
-                page.Visible = false;
-            }
 
             InitializePopup();
+            // 팝업 컨트롤은 다른 페이지들과 달리 Dock.Fill을 사용하지 않으므로,
+            // Controls 컬렉션에 나중에 추가하는 것이 좋습니다.
+            this.Controls.Add(optionPopup);
 
+            foreach (Control page in this.Controls)
+            {
+                if (page is UserControl && page != optionPopup)
+                {
+                    page.Dock = DockStyle.Fill;
+                    page.Visible = false;
+                }
+            }
+
+            // 이벤트 구독
             pageDefault.ScreenClicked += OnDefaultPageScreenClicked;
             pageSelectStage.OrderTypeSelected += OnOrderTypeSelected;
-            pageMain.ProceedToPaymentClicked += PageMain_ProceedToPaymentClicked;
             pageMain.ProductSelected += OnProductSelected;
+            pageMain.ProceedToPaymentClicked += OnProceedToPaymentClicked; // OnProceedToPaymentClicked로 수정
             pagePayment.BackButtonClicked += (s, ev) => ShowPage(pageMain);
 
-            await Task.WhenAll(LoadDefaultPageData(), LoadMainPageData());
+            optionPopup.ConfirmClicked += OptionPopup_ConfirmClicked;
+            optionPopup.CancelClicked += (s, e) => HideOptionPopup();
 
+            await Task.WhenAll(LoadSharedResourcesAsync(), LoadDefaultPageData(), LoadMainPageData());
+
+            ApplyLogosToPages();
             pageMain.SetInitialData(preloadedCategories, preloadedProducts);
+            pageDefault.StartAds(preloadedAdImages); // 올바른 변수 이름으로 수정
+
             ShowPage(pageDefault);
             this.Cursor = Cursors.Default;
-        }
-
-        private void PageMain_ProceedToPaymentClicked(object? sender, CartEventArgs e)
-        {
-            // 1. 결제 페이지(UserControl)에 장바구니 데이터를 채워줍니다.
-            pagePayment.PopulateCart(e.ShoppingCart);
-
-            // 2. 결제 페이지를 화면에 보여줍니다.
-            ShowPage(pagePayment);
         }
 
         private async void OnProductSelected(object sender, ProductSelectedEventArgs e)
@@ -92,29 +100,21 @@ namespace User_Kiosk_Program
             ShowOptionPopup(product);
         }
 
-        // 팝업 관리 메서드들 (popupOverlay 관련 코드 모두 삭제)
         private void InitializePopup()
         {
             optionPopup = new Pop_Option_Drink { Visible = false, Size = new Size(600, 720), Location = new Point((this.Width - 600) / 2, (this.Height - 720) / 2), Anchor = AnchorStyles.None };
-            this.Controls.Add(optionPopup);
-
-            optionPopup.ConfirmClicked += OptionPopup_ConfirmClicked;
-            optionPopup.CancelClicked += (s, e) => HideOptionPopup();
         }
 
-        private void OptionPopup_ConfirmClicked(object? sender, OrderItemEventArgs e)
+        private void OptionPopup_ConfirmClicked(object sender, OrderItemEventArgs e)
         {
-            // Page_Main의 장바구니에 아이템 추가
             pageMain.AddItemToCart(e.Item);
-
-            // 팝업 닫기
             HideOptionPopup();
         }
 
         private void ShowOptionPopup(Product product)
         {
             optionPopup.SetProduct(product);
-            optionPopup.BringToFront(); // 팝업만 맨 앞으로 가져옵니다.
+            optionPopup.BringToFront();
             optionPopup.Visible = true;
         }
 
@@ -123,19 +123,18 @@ namespace User_Kiosk_Program
             optionPopup.Visible = false;
         }
 
-        // 페이지 전환 및 데이터 로딩 로직 (이하 동일)
         private async Task LoadDefaultPageData()
         {
             List<string> adUrls = await Task.Run(() => DatabaseManager.Instance.GetAdImageUrls());
-            List<Image> adImages = new List<Image>();
+            // preloadedAdImages 리스트에 이미지 저장
+            preloadedAdImages = new List<Image>();
             foreach (var url in adUrls)
             {
                 var imageStream = await httpClient.GetStreamAsync(url);
                 var originalImage = Image.FromStream(imageStream);
-                adImages.Add(ImageHelper.ResizeImage(originalImage, pageDefault.Size));
+                preloadedAdImages.Add(ImageHelper.ResizeImage(originalImage, pageDefault.Size));
                 originalImage.Dispose();
             }
-            pageDefault.StartAds(adImages);
         }
 
         private async Task LoadMainPageData()
@@ -172,6 +171,19 @@ namespace User_Kiosk_Program
                 }
             }
             await Task.WhenAll(imageLoadTasks);
+        }
+
+        private async Task LoadSharedResourcesAsync()
+        {
+            appLogo = await Task.Run(() => DatabaseManager.Instance.GetSystemImage("main_logo"));
+        }
+
+        private void ApplyLogosToPages()
+        {
+            //pageDefault.SetLogo(appLogo);
+            //pageSelectStage.SetLogo(appLogo);
+            pageMain.SetLogo(appLogo);
+            pagePayment.SetLogo(appLogo);
         }
 
         private async void OnDefaultPageScreenClicked(object sender, EventArgs e)
@@ -215,12 +227,15 @@ namespace User_Kiosk_Program
 
         private void ShowPage(Control pageToShow)
         {
+            // 팝업이 아닌 페이지만 보이도록 처리
             foreach (Control page in this.Controls)
             {
-                page.Visible = (page == pageToShow);
+                if (page is UserControl && page != optionPopup)
+                    page.Visible = (page == pageToShow);
             }
         }
 
+        // ▼▼▼▼▼ 참조 오류가 발생한 메서드 이름을 OnProceedToPaymentClicked -> PageMain_ProceedToPaymentClicked로 수정 ▼▼▼▼▼
         private void OnProceedToPaymentClicked(object sender, CartEventArgs e)
         {
             // 결제 페이지에 장바구니 데이터를 채우고

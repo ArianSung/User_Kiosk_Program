@@ -142,6 +142,16 @@ namespace User_Kiosk_Program
             return mainPanel;
         }
 
+        public void SetLogo(Image logoImage)
+        {
+            if (logoImage != null && pb_Logo != null)
+            {
+                // ▼▼▼▼▼ 이미 만들어져 있는 ImageHelper.ResizeImage 메서드를 사용합니다 ▼▼▼▼▼
+                pb_Logo.Image = ImageHelper.ResizeImage(logoImage, pb_Logo.Size);
+                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+            }
+        }
+
         private void label1_Click(object sender, EventArgs e)
         {
 

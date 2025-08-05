@@ -35,6 +35,9 @@
             btn_Prev = new Button();
             lbl_PageInfo = new Label();
             btn_GotoPay = new Button();
+            lbl_CartTotal = new Label();
+            pb_Logo = new PictureBox();
+            ((System.ComponentModel.ISupportInitialize)pb_Logo).BeginInit();
             SuspendLayout();
             // 
             // pn_BoardContainer
@@ -86,45 +89,51 @@
             lbl_PageInfo.Size = new Size(39, 15);
             lbl_PageInfo.TabIndex = 8;
             lbl_PageInfo.Text = "label1";
-            //
+            // 
             // btn_GotoPay
-            //
-            this.btn_GotoPay = new System.Windows.Forms.Button();
-            this.btn_GotoPay.Font = new System.Drawing.Font("맑은 고딕", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.btn_GotoPay.Location = new System.Drawing.Point(546, 940);
-            this.btn_GotoPay.Name = "btn_GotoPay";
-            this.btn_GotoPay.Size = new System.Drawing.Size(110, 60);
-            this.btn_GotoPay.TabIndex = 9;
-            this.btn_GotoPay.Text = "결제하기";
-            this.btn_GotoPay.UseVisualStyleBackColor = true;
-            //
+            // 
+            btn_GotoPay.Font = new Font("맑은 고딕", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            btn_GotoPay.Location = new Point(546, 940);
+            btn_GotoPay.Name = "btn_GotoPay";
+            btn_GotoPay.Size = new Size(110, 60);
+            btn_GotoPay.TabIndex = 9;
+            btn_GotoPay.Text = "결제하기";
+            btn_GotoPay.UseVisualStyleBackColor = true;
+            // 
             // lbl_CartTotal
-            //
-            this.lbl_CartTotal = new System.Windows.Forms.Label();
-            this.lbl_CartTotal.Font = new System.Drawing.Font("맑은 고딕", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.lbl_CartTotal.Location = new System.Drawing.Point(56, 940);
-            this.lbl_CartTotal.Name = "lbl_CartTotal";
-            this.lbl_CartTotal.Size = new System.Drawing.Size(480, 60);
-            this.lbl_CartTotal.TabIndex = 10;
-            this.lbl_CartTotal.Text = "총 금액: ₩ 0";
-            this.lbl_CartTotal.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            lbl_CartTotal.Font = new Font("맑은 고딕", 15.75F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl_CartTotal.Location = new Point(56, 940);
+            lbl_CartTotal.Name = "lbl_CartTotal";
+            lbl_CartTotal.Size = new Size(480, 60);
+            lbl_CartTotal.TabIndex = 10;
+            lbl_CartTotal.Text = "총 금액: ₩ 0";
+            lbl_CartTotal.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // pb_Logo
+            // 
+            pb_Logo.Location = new Point(647, 3);
+            pb_Logo.Name = "pb_Logo";
+            pb_Logo.Size = new Size(70, 70);
+            pb_Logo.TabIndex = 11;
+            pb_Logo.TabStop = false;
             // 
             // Page_Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(btn_GotoPay);
             Controls.Add(btn_Next);
             Controls.Add(btn_Prev);
             Controls.Add(lbl_PageInfo);
             Controls.Add(pn_BoardContainer);
             Controls.Add(flp_Cart);
             Controls.Add(flp_Categories);
-            this.Controls.Add(this.btn_GotoPay); // 이 줄을 추가하세요.
-            this.Controls.Add(this.lbl_CartTotal); // 이 줄을 추가하세요.
-            this.Name = "Page_Main";
-           
+            Controls.Add(btn_GotoPay);
+            Controls.Add(lbl_CartTotal);
+            Controls.Add(pb_Logo);
+            Name = "Page_Main";
             Size = new Size(720, 1020);
+            ((System.ComponentModel.ISupportInitialize)pb_Logo).EndInit();
             ResumeLayout(false);
             PerformLayout();
 
@@ -139,5 +148,6 @@
         private Label lbl_PageInfo;
         private Button btn_GotoPay;
         private Label lbl_CartTotal; // 이 줄을 추가하세요.
+        private PictureBox pb_Logo;
     }
 }

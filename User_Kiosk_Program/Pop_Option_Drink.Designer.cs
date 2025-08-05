@@ -87,14 +87,12 @@
             // 
             // lb_Select_Info
             // 
-            this.lb_Select_Info.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.lb_Select_Info.Location = new System.Drawing.Point(220, 130);
-            this.lb_Select_Info.Name = "lb_Select_Info";
-            // AutoSize를 false로 설정해야 줄바꿈이 가능합니다.
-            this.lb_Select_Info.AutoSize = false;
-            this.lb_Select_Info.Size = new System.Drawing.Size(350, 74); // 라벨의 크기를 고정합니다.
-            this.lb_Select_Info.TabIndex = 6;
-            this.lb_Select_Info.Text = "상품 설명이 여기에 표시됩니다.";
+            lb_Select_Info.Font = new Font("맑은 고딕", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
+            lb_Select_Info.Location = new Point(220, 130);
+            lb_Select_Info.Name = "lb_Select_Info";
+            lb_Select_Info.Size = new Size(350, 74);
+            lb_Select_Info.TabIndex = 6;
+            lb_Select_Info.Text = "상품 설명이 여기에 표시됩니다.";
             // 
             // Pop_Option_Drink
             // 

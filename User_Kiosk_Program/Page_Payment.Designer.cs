@@ -38,7 +38,9 @@
             label3 = new Label();
             label1 = new Label();
             btn_Pay = new Button();
+            pb_Logo = new PictureBox();
             panel_PaymentDetails.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pb_Logo).BeginInit();
             SuspendLayout();
             // 
             // flp_Payment_Cart
@@ -72,16 +74,16 @@
             panel_PaymentDetails.Controls.Add(label4);
             panel_PaymentDetails.Controls.Add(label3);
             panel_PaymentDetails.Controls.Add(label1);
-            panel_PaymentDetails.Location = new Point(60, 770);
+            panel_PaymentDetails.Location = new Point(60, 753);
             panel_PaymentDetails.Name = "panel_PaymentDetails";
-            panel_PaymentDetails.Size = new Size(600, 97);
+            panel_PaymentDetails.Size = new Size(600, 77);
             panel_PaymentDetails.TabIndex = 3;
             // 
             // lbl_FinalAmount
             // 
             lbl_FinalAmount.Font = new Font("맑은 고딕", 15.75F, FontStyle.Bold, GraphicsUnit.Point);
             lbl_FinalAmount.ForeColor = Color.Red;
-            lbl_FinalAmount.Location = new Point(430, 50);
+            lbl_FinalAmount.Location = new Point(430, 39);
             lbl_FinalAmount.Name = "lbl_FinalAmount";
             lbl_FinalAmount.Size = new Size(150, 30);
             lbl_FinalAmount.TabIndex = 6;
@@ -91,7 +93,7 @@
             // lbl_PointsUsed
             // 
             lbl_PointsUsed.Font = new Font("맑은 고딕", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            lbl_PointsUsed.Location = new Point(149, 37);
+            lbl_PointsUsed.Location = new Point(149, 47);
             lbl_PointsUsed.Name = "lbl_PointsUsed";
             lbl_PointsUsed.Size = new Size(130, 21);
             lbl_PointsUsed.TabIndex = 5;
@@ -101,7 +103,7 @@
             // lbl_OrderAmount
             // 
             lbl_OrderAmount.Font = new Font("맑은 고딕", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            lbl_OrderAmount.Location = new Point(13, 34);
+            lbl_OrderAmount.Location = new Point(13, 47);
             lbl_OrderAmount.Name = "lbl_OrderAmount";
             lbl_OrderAmount.Size = new Size(130, 21);
             lbl_OrderAmount.TabIndex = 4;
@@ -150,10 +152,19 @@
             btn_Pay.Text = "결제하기";
             btn_Pay.UseVisualStyleBackColor = true;
             // 
+            // pb_Logo
+            // 
+            pb_Logo.Location = new Point(647, 3);
+            pb_Logo.Name = "pb_Logo";
+            pb_Logo.Size = new Size(70, 70);
+            pb_Logo.TabIndex = 12;
+            pb_Logo.TabStop = false;
+            // 
             // Page_Payment
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(pb_Logo);
             Controls.Add(btn_Pay);
             Controls.Add(panel_PaymentDetails);
             Controls.Add(btn_Back);
@@ -162,6 +173,7 @@
             Size = new Size(720, 1020);
             panel_PaymentDetails.ResumeLayout(false);
             panel_PaymentDetails.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pb_Logo).EndInit();
             ResumeLayout(false);
 
         }
@@ -178,5 +190,6 @@
         private Label label3;
         private Label label1;
         private Button btn_Pay;
+        private PictureBox pb_Logo;
     }
 }

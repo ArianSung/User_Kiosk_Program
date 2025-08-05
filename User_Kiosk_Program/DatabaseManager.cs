@@ -91,6 +91,40 @@ namespace User_Kiosk_Program
             return url;
         }
 
+        public Image GetSystemImage(string imageKey)
+        {
+            Image image = null;
+            string query = "SELECT image_data FROM system_images WHERE image_key = @key";
+            using (var conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@key", imageKey);
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read() && !reader.IsDBNull(0))
+                            {
+                                // BLOB 데이터를 byte 배열로 읽어와 MemoryStream을 통해 Image 객체로 변환
+                                byte[] imageData = (byte[])reader["image_data"];
+                                using (var ms = new MemoryStream(imageData))
+                                {
+                                    image = Image.FromStream(ms);
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"시스템 이미지 로딩 오류: {ex.Message}");
+                }
+            }
+            return image;
+        }
+
         public List<Category> GetCategories()
         {
             var categories = new List<Category>();

@@ -295,6 +295,18 @@ namespace User_Kiosk_Program
             decimal totalPrice = shoppingCart.Sum(item => item.TotalPrice);
             lbl_CartTotal.Text = $"총 금액: ₩ {totalPrice:N0}";
         }
+
+        public void SetLogo(Image logoImage)
+        {
+            if (logoImage != null && pb_Logo != null)
+            {
+                // ▼▼▼▼▼ 이미 만들어져 있는 ImageHelper.ResizeImage 메서드를 사용합니다 ▼▼▼▼▼
+                pb_Logo.Image = ImageHelper.ResizeImage(logoImage, pb_Logo.Size);
+                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+            }
+        }
+
+
     }
     public class ProductSelectedEventArgs : EventArgs
     {
