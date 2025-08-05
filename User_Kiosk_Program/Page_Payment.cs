@@ -84,7 +84,19 @@ namespace User_Kiosk_Program
             PictureBox picProduct = new PictureBox { Image = item.BaseProduct.ProductImage, Location = new Point(15, 15), Size = new Size(90, 90), SizeMode = PictureBoxSizeMode.Zoom };
             Label lblProductName = new Label { Text = item.BaseProduct.ProductName, Location = new Point(120, 18), Font = new Font("맑은 고딕", 14.25F, FontStyle.Bold), AutoSize = true };
             var optionsText = string.Join(", ", item.SelectedOptions.Values.Select(opt => opt.OptionName));
-            Label lblOptions = new Label { Text = "- " + optionsText, Location = new Point(125, 50), Font = new Font("맑은 고딕", 9.75F), ForeColor = Color.DimGray, AutoSize = false, Size = new Size(450, 40) };
+            if (optionsText.Length > 70)
+            {
+                optionsText = optionsText.Substring(0, 70) + "....";
+            }
+            Label lblOptions = new Label
+            {
+                Text = "- " + optionsText, // 수정된 텍스트를 사용합니다.
+                Location = new Point(125, 50),
+                Font = new Font("맑은 고딕", 9.75F, FontStyle.Regular, GraphicsUnit.Point),
+                ForeColor = Color.DimGray,
+                AutoSize = false,
+                Size = new Size(450, 40)
+            };
             Button btnMinus = new Button { Text = "-", Location = new Point(125, 100), Size = new Size(30, 30) };
             Label lblQuantity = new Label { Text = item.Quantity.ToString(), Location = new Point(160, 100), Size = new Size(40, 30), Font = new Font("맑은 고딕", 12F, FontStyle.Bold), TextAlign = ContentAlignment.MiddleCenter };
             Button btnPlus = new Button { Text = "+", Location = new Point(205, 100), Size = new Size(30, 30) };
@@ -93,6 +105,13 @@ namespace User_Kiosk_Program
             btnRemove.FlatAppearance.BorderSize = 0;
 
             mainPanel.Controls.AddRange(new Control[] { picProduct, lblProductName, lblOptions, btnMinus, lblQuantity, btnPlus, lblPrice, btnRemove });
+
+
+            
+            
+
+
+
 
             // 이벤트 핸들러 연결
             btnPlus.Click += (s, e) =>

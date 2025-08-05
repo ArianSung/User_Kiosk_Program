@@ -74,7 +74,7 @@
             panel_PaymentDetails.Controls.Add(label1);
             panel_PaymentDetails.Location = new Point(60, 770);
             panel_PaymentDetails.Name = "panel_PaymentDetails";
-            panel_PaymentDetails.Size = new Size(600, 150);
+            panel_PaymentDetails.Size = new Size(600, 97);
             panel_PaymentDetails.TabIndex = 3;
             // 
             // lbl_FinalAmount
@@ -91,7 +91,7 @@
             // lbl_PointsUsed
             // 
             lbl_PointsUsed.Font = new Font("맑은 고딕", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            lbl_PointsUsed.Location = new Point(276, 59);
+            lbl_PointsUsed.Location = new Point(149, 37);
             lbl_PointsUsed.Name = "lbl_PointsUsed";
             lbl_PointsUsed.Size = new Size(130, 21);
             lbl_PointsUsed.TabIndex = 5;
@@ -101,7 +101,7 @@
             // lbl_OrderAmount
             // 
             lbl_OrderAmount.Font = new Font("맑은 고딕", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            lbl_OrderAmount.Location = new Point(140, 58);
+            lbl_OrderAmount.Location = new Point(13, 34);
             lbl_OrderAmount.Name = "lbl_OrderAmount";
             lbl_OrderAmount.Size = new Size(130, 21);
             lbl_OrderAmount.TabIndex = 4;
@@ -123,7 +123,7 @@
             // 
             label3.AutoSize = true;
             label3.Font = new Font("맑은 고딕", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label3.Location = new Point(276, 16);
+            label3.Location = new Point(149, 16);
             label3.Name = "label3";
             label3.Size = new Size(96, 21);
             label3.TabIndex = 2;
@@ -133,7 +133,7 @@
             // 
             label1.AutoSize = true;
             label1.Font = new Font("맑은 고딕", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label1.Location = new Point(140, 16);
+            label1.Location = new Point(13, 13);
             label1.Name = "label1";
             label1.Size = new Size(74, 21);
             label1.TabIndex = 0;
