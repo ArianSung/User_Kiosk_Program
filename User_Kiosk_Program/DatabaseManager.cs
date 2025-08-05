@@ -157,8 +157,8 @@ namespace User_Kiosk_Program
         public List<OptionGroup> GetOptionsForProduct(int productId)
         {
             var optionGroups = new List<OptionGroup>();
-            // 쿼리에 is_required 컬럼 추가
-            string groupQuery = "SELECT group_id, group_name, is_required FROM option_groups WHERE product_id = @product_id ORDER BY display_order";
+            // 쿼리에 allow_multiple 컬럼 추가
+            string groupQuery = "SELECT group_id, group_name, is_required, allow_multiple FROM option_groups WHERE product_id = @product_id ORDER BY display_order";
 
             using (var conn = GetConnection())
             {
@@ -174,8 +174,9 @@ namespace User_Kiosk_Program
                             {
                                 GroupId = groupReader.GetInt32("group_id"),
                                 GroupName = groupReader.GetString("group_name"),
-                                // is_required 값을 읽어와 속성에 저장
-                                IsRequired = groupReader.GetBoolean("is_required")
+                                IsRequired = groupReader.GetBoolean("is_required"),
+                                // allow_multiple 값을 읽어와 속성에 저장
+                                AllowMultiple = groupReader.GetBoolean("allow_multiple")
                             };
                             optionGroups.Add(group);
                         }

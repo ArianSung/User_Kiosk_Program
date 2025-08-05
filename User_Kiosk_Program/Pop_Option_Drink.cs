@@ -37,20 +37,21 @@ namespace User_Kiosk_Program
 
         private void Btn_Confirm_Click(object sender, EventArgs e)
         {
-            // 필수 옵션 검사
             foreach (var group in currentProduct.OptionGroups)
             {
-                if (group.IsRequired && !selectedOptions.ContainsKey(group.GroupId))
+                if (group.IsRequired)
                 {
-                    MessageBox.Show($"'{group.GroupName}'은(는) 필수 선택 항목입니다.", "알림");
-                    return;
+                    // 그룹에 속한 옵션 ID들 중 하나라도 selectedOptions에 포함되어 있는지 확인
+                    bool isSelected = group.Options.Any(opt => selectedOptions.ContainsKey(opt.OptionId));
+                    if (!isSelected)
+                    {
+                        MessageBox.Show($"'{group.GroupName}'은(는) 필수 선택 항목입니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
                 }
             }
 
-            // 선택된 상품과 옵션들로 OrderItem 객체 생성
             var orderItem = new OrderItem(currentProduct, selectedOptions);
-
-            // OrderItem 객체를 담아 이벤트 발생
             ConfirmClicked?.Invoke(this, new OrderItemEventArgs(orderItem));
         }
 
@@ -126,22 +127,48 @@ namespace User_Kiosk_Program
             btn.Click += (s, e) => {
                 var clickedOption = (Option)btn.Tag;
 
-                // 같은 그룹 내 다른 버튼들은 모두 선택 해제
-                foreach (Control c in btn.Parent.Controls)
+                if (group.AllowMultiple) // 중복 선택이 가능한 그룹일 경우
                 {
-                    if (c is Button)
+                    // 체크박스처럼 동작: 현재 버튼의 선택 상태를 토글
+                    if (selectedOptions.ContainsKey(clickedOption.OptionId)) // 이미 선택된 상태라면
                     {
-                        c.BackColor = Color.White;
-                        (c as Button).FlatAppearance.BorderColor = Color.LightGray;
+                        btn.BackColor = Color.White;
+                        btn.FlatAppearance.BorderColor = Color.LightGray;
+                        selectedOptions.Remove(clickedOption.OptionId); // 선택 해제
+                    }
+                    else // 선택되지 않은 상태라면
+                    {
+                        btn.BackColor = Color.SkyBlue;
+                        btn.FlatAppearance.BorderColor = Color.DodgerBlue;
+                        selectedOptions[clickedOption.OptionId] = clickedOption; // 선택
                     }
                 }
+                else // 단일 선택만 가능한 그룹일 경우
+                {
+                    // 라디오 버튼처럼 동작: 먼저 그룹 내 모든 버튼을 초기화
+                    foreach (Control c in btn.Parent.Controls)
+                    {
+                        if (c is Button)
+                        {
+                            c.BackColor = Color.White;
+                            ((Button)c).FlatAppearance.BorderColor = Color.LightGray;
+                        }
+                    }
+                    // 그룹 내 기존 선택 제거
+                    var groupOptions = group.Options.Select(opt => opt.OptionId);
+                    var selectedKeyToRemove = selectedOptions.Keys.FirstOrDefault(key => groupOptions.Contains(key));
+                    if (selectedKeyToRemove != 0)
+                    {
+                        selectedOptions.Remove(selectedKeyToRemove);
+                    }
 
-                // 현재 클릭된 버튼만 선택
-                btn.BackColor = Color.SkyBlue;
-                btn.FlatAppearance.BorderColor = Color.DodgerBlue;
+                    // 현재 클릭된 버튼만 선택
+                    btn.BackColor = Color.SkyBlue;
+                    btn.FlatAppearance.BorderColor = Color.DodgerBlue;
 
-                // 선택된 옵션을 Dictionary에 저장 (그룹 ID를 키로 사용)
-                selectedOptions[group.GroupId] = clickedOption;
+                    // 선택된 옵션을 저장 (여기서는 옵션 ID를 키로 사용)
+                    selectedOptions[clickedOption.OptionId] = clickedOption;
+                }
             };
         }
     }
