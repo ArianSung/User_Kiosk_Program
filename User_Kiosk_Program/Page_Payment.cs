@@ -90,7 +90,7 @@ namespace User_Kiosk_Program
             }
             Label lblOptions = new Label
             {
-                Text = "- " + optionsText, // 수정된 텍스트를 사용합니다.
+                Text = "- " + optionsText,
                 Location = new Point(125, 50),
                 Font = new Font("맑은 고딕", 9.75F, FontStyle.Regular, GraphicsUnit.Point),
                 ForeColor = Color.DimGray,
@@ -110,23 +110,39 @@ namespace User_Kiosk_Program
             // 이벤트 핸들러 연결
             btnPlus.Click += (s, e) =>
             {
+                // ▼▼▼▼▼ 1. 현재 스크롤 위치 저장 ▼▼▼▼▼
+                int scrollPosition = flp_Payment_Cart.VerticalScroll.Value;
+
                 item.Quantity++;
-                this.orderAmount = currentCart.Sum(i => i.TotalPrice); // 전체 주문 금액 재계산
-                RenderCartItems();      // 아이템 목록 UI 갱신
-                UpdatePaymentSummary(); // 결제 정보 UI 갱신
+                this.orderAmount = currentCart.Sum(i => i.TotalPrice);
+                RenderCartItems();
+                UpdatePaymentSummary();
+
+                // ▼▼▼▼▼ 2. 저장했던 스크롤 위치로 복원 ▼▼▼▼▼
+                flp_Payment_Cart.VerticalScroll.Value = scrollPosition;
+                flp_Payment_Cart.PerformLayout(); // 레이아웃을 즉시 업데이트하여 스크롤 위치 적용
             };
             btnMinus.Click += (s, e) =>
             {
                 if (item.Quantity > 1)
                 {
+                    // ▼▼▼▼▼ 1. 현재 스크롤 위치 저장 ▼▼▼▼▼
+                    int scrollPosition = flp_Payment_Cart.VerticalScroll.Value;
+
                     item.Quantity--;
                     this.orderAmount = currentCart.Sum(i => i.TotalPrice);
                     RenderCartItems();
                     UpdatePaymentSummary();
+
+                    // ▼▼▼▼▼ 2. 저장했던 스크롤 위치로 복원 ▼▼▼▼▼
+                    flp_Payment_Cart.VerticalScroll.Value = scrollPosition;
+                    flp_Payment_Cart.PerformLayout();
                 }
             };
             btnRemove.Click += (s, e) =>
             {
+                // 삭제 시에는 목록이 바뀌므로 스크롤을 맨 위로 올리는 것이 자연스러울 수 있습니다.
+                // 만약 삭제 시에도 위치를 유지하고 싶다면 위와 동일한 로직을 추가하면 됩니다.
                 currentCart.Remove(item);
                 this.orderAmount = currentCart.Sum(i => i.TotalPrice);
                 RenderCartItems();
