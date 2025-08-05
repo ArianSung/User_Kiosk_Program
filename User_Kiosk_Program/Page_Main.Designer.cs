@@ -42,6 +42,7 @@
             // 
             // pn_BoardContainer
             // 
+            pn_BoardContainer.BackColor = Color.White;
             pn_BoardContainer.Location = new Point(56, 130);
             pn_BoardContainer.Name = "pn_BoardContainer";
             pn_BoardContainer.Size = new Size(600, 589);
@@ -57,6 +58,7 @@
             // flp_Cart
             // 
             flp_Cart.AutoScroll = true;
+            flp_Cart.BackColor = Color.White;
             flp_Cart.Location = new Point(56, 753);
             flp_Cart.Name = "flp_Cart";
             flp_Cart.Size = new Size(600, 180);
@@ -69,7 +71,7 @@
             btn_Next.Name = "btn_Next";
             btn_Next.Size = new Size(75, 23);
             btn_Next.TabIndex = 6;
-            btn_Next.Text = "button1";
+            btn_Next.Text = "다음";
             btn_Next.UseVisualStyleBackColor = true;
             // 
             // btn_Prev
@@ -78,7 +80,7 @@
             btn_Prev.Name = "btn_Prev";
             btn_Prev.Size = new Size(75, 23);
             btn_Prev.TabIndex = 7;
-            btn_Prev.Text = "button2";
+            btn_Prev.Text = "이전";
             btn_Prev.UseVisualStyleBackColor = true;
             // 
             // lbl_PageInfo

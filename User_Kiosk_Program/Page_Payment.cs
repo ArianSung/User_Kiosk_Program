@@ -107,12 +107,6 @@ namespace User_Kiosk_Program
             mainPanel.Controls.AddRange(new Control[] { picProduct, lblProductName, lblOptions, btnMinus, lblQuantity, btnPlus, lblPrice, btnRemove });
 
 
-            
-            
-
-
-
-
             // 이벤트 핸들러 연결
             btnPlus.Click += (s, e) =>
             {
@@ -150,6 +144,15 @@ namespace User_Kiosk_Program
                 pb_Logo.Image = ImageHelper.ResizeImage(logoImage, pb_Logo.Size);
                 // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
             }
+        }
+
+        // 테마세팅
+        public void SetTheme(Color mainColor, Color panelColor)
+        {
+
+            //btn_GotoPay.BackColor = mainColor;
+
+            this.BackColor = panelColor;
         }
 
         private void label1_Click(object sender, EventArgs e)

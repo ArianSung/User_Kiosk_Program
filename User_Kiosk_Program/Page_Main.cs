@@ -83,7 +83,7 @@ namespace User_Kiosk_Program
             if (categories == null) return;
             foreach (var category in categories)
             {
-                var btn = new Button { Text = string.IsNullOrEmpty(category.CategoryName) ? "이름없음" : category.CategoryName, Tag = category.CategoryId, Size = new Size(110, 60), Margin = new Padding(5) };
+                var btn = new Button { Text = string.IsNullOrEmpty(category.CategoryName) ? "이름없음" : category.CategoryName, Tag = category.CategoryId, Size = new Size(110, 60), Margin = new Padding(5), BackColor = Color.White };
                 btn.Click += CategoryButton_Click;
                 flp_Categories.Controls.Add(btn);
             }
@@ -310,6 +310,16 @@ namespace User_Kiosk_Program
             {
                 pb_Logo.Image = ImageHelper.ResizeImage(logoImage, pb_Logo.Size);
             }
+        }
+
+
+        // 테마세팅
+        public void SetTheme(Color mainColor, Color panelColor)
+        {
+           
+            btn_GotoPay.BackColor = mainColor;
+
+            this.BackColor = panelColor;
         }
 
 
