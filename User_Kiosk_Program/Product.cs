@@ -13,6 +13,7 @@ namespace User_Kiosk_Program
         public string ProductName { get; set; }
         public decimal BasePrice { get; set; }
         public string ProductImageUrl { get; set; } // DB에서 가져온 URL을 저장할 속성
+        public string ProductDescription { get; set; }
         public Image ProductImage { get; set; }      // URL을 통해 로드된 최종 이미지를 저장할 속성
         public List<OptionGroup> OptionGroups { get; set; }
 

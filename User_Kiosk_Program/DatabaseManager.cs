@@ -121,7 +121,8 @@ namespace User_Kiosk_Program
         public List<Product> GetProductsByCategory(int categoryId)
         {
             var products = new List<Product>();
-            string query = "SELECT product_id, product_name, base_price, product_image FROM products WHERE category_id = @category_id";
+            // 쿼리에 'description' 컬럼 추가
+            string query = "SELECT product_id, product_name, base_price, description, product_image FROM products WHERE category_id = @category_id";
             using (var conn = GetConnection())
             {
                 try
@@ -139,7 +140,8 @@ namespace User_Kiosk_Program
                                     ProductId = reader.GetInt32("product_id"),
                                     ProductName = reader.GetString("product_name"),
                                     BasePrice = reader.GetDecimal("base_price"),
-                                    // VARCHAR(URL)를 string으로 읽도록 수정
+                                    // description 값을 ProductDescription 속성에 저장
+                                    ProductDescription = reader.IsDBNull(reader.GetOrdinal("description")) ? "" : reader.GetString("description"),
                                     ProductImageUrl = reader.IsDBNull(reader.GetOrdinal("product_image")) ? null : reader.GetString("product_image")
                                 };
                                 products.Add(product);
@@ -155,7 +157,8 @@ namespace User_Kiosk_Program
         public List<OptionGroup> GetOptionsForProduct(int productId)
         {
             var optionGroups = new List<OptionGroup>();
-            string groupQuery = "SELECT group_id, group_name FROM option_groups WHERE product_id = @product_id ORDER BY display_order";
+            // 쿼리에 is_required 컬럼 추가
+            string groupQuery = "SELECT group_id, group_name, is_required FROM option_groups WHERE product_id = @product_id ORDER BY display_order";
 
             using (var conn = GetConnection())
             {
@@ -170,7 +173,9 @@ namespace User_Kiosk_Program
                             var group = new OptionGroup
                             {
                                 GroupId = groupReader.GetInt32("group_id"),
-                                GroupName = groupReader.GetString("group_name")
+                                GroupName = groupReader.GetString("group_name"),
+                                // is_required 값을 읽어와 속성에 저장
+                                IsRequired = groupReader.GetBoolean("is_required")
                             };
                             optionGroups.Add(group);
                         }
