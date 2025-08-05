@@ -35,6 +35,7 @@
             // 
             // flp_Payment_Cart
             // 
+            flp_Payment_Cart.AutoScroll = true;
             flp_Payment_Cart.Location = new Point(49, 207);
             flp_Payment_Cart.Name = "flp_Payment_Cart";
             flp_Payment_Cart.Size = new Size(620, 480);
@@ -43,7 +44,7 @@
             // lbl_TotalPrice
             // 
             lbl_TotalPrice.AutoSize = true;
-            lbl_TotalPrice.Location = new Point(300, 796);
+            lbl_TotalPrice.Location = new Point(321, 719);
             lbl_TotalPrice.Name = "lbl_TotalPrice";
             lbl_TotalPrice.Size = new Size(39, 15);
             lbl_TotalPrice.TabIndex = 1;
