@@ -8,24 +8,21 @@ using System.Windows.Forms;
 
 namespace User_Kiosk_Program
 {
-    public class ProductSelectedEventArgs : EventArgs
-    {
-        public Product SelectedProduct { get; }
-        public ProductSelectedEventArgs(Product product)
-        {
-            SelectedProduct = product;
-        }
-    }
-
     public partial class Page_Main : UserControl
     {
         public event EventHandler<ProductSelectedEventArgs> ProductSelected;
 
+        private List<OrderItem> shoppingCart = new List<OrderItem>();
         private List<Category> categories;
         private Dictionary<int, List<Product>> productsByCategory = new Dictionary<int, List<Product>>();
         private int currentCategoryId = -1;
         private int currentPage = 1;
         private int totalPages = 1;
+
+        // 터치 스크롤 관련 변수
+        private bool isTouching = false;
+        private Point touchStartPoint;
+        private int startScrollOffset;
 
         private readonly HttpClient httpClient = new HttpClient();
         private FlowLayoutPanel flp_Menu_Board;
@@ -38,7 +35,63 @@ namespace User_Kiosk_Program
             slideTimer.Tick += SlideTimer_Tick;
             btn_Prev.Click += btn_Prev_Click;
             btn_Next.Click += btn_Next_Click;
+
+            // 터치 스크롤 이벤트 핸들러 (MouseEnter/Leave는 제거)
+            flp_Cart.MouseDown += Flp_Cart_MouseDown;
+            flp_Cart.MouseMove += Flp_Cart_MouseMove;
+            flp_Cart.MouseUp += Flp_Cart_MouseUp;
         }
+
+        public void AddItemToCart(OrderItem item)
+        {
+            shoppingCart.Add(item);
+            UpdateCartView();
+        }
+
+        private void UpdateCartView()
+        {
+            flp_Cart.Controls.Clear();
+            foreach (var item in shoppingCart)
+            {
+                // 1. 패널 높이를 170으로 줄여 세로 스크롤 문제 해결
+                var itemPanel = new Panel { Size = new Size(140, 150), Margin = new Padding(5), BorderStyle = BorderStyle.FixedSingle, Tag = item };
+
+                var pic = new PictureBox { Image = item.BaseProduct.ProductImage, SizeMode = PictureBoxSizeMode.Zoom, Dock = DockStyle.Top, Height = 90 };
+                var btnRemove = new Button { Text = "X", Size = new Size(20, 20), BackColor = Color.LightCoral, ForeColor = Color.White, FlatStyle = FlatStyle.Flat };
+                btnRemove.FlatAppearance.BorderSize = 0;
+                btnRemove.Location = new Point(itemPanel.Width - btnRemove.Width - 2, 2);
+                btnRemove.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+
+                // 2. 이름 라벨의 Dock을 Fill로 변경하여 위치 문제 해결
+                var nameLabel = new Label { Text = item.BaseProduct.ProductName, Dock = DockStyle.Fill, TextAlign = System.Drawing.ContentAlignment.MiddleCenter };
+
+                var qtyPanel = new Panel { Dock = DockStyle.Bottom, Height = 30 };
+                var btnMinus = new Button { Text = "-", Dock = DockStyle.Left, Width = 30 };
+                var btnPlus = new Button { Text = "+", Dock = DockStyle.Right, Width = 30 };
+                var lblQty = new Label { Text = item.Quantity.ToString(), Dock = DockStyle.Fill, TextAlign = System.Drawing.ContentAlignment.MiddleCenter };
+
+                btnPlus.Click += (s, e) => { item.Quantity++; lblQty.Text = item.Quantity.ToString(); };
+                btnMinus.Click += (s, e) => { if (item.Quantity > 1) { item.Quantity--; lblQty.Text = item.Quantity.ToString(); } };
+                btnRemove.Click += (s, e) => { shoppingCart.Remove(item); UpdateCartView(); };
+
+                qtyPanel.Controls.Add(btnMinus);
+                qtyPanel.Controls.Add(btnPlus);
+                qtyPanel.Controls.Add(lblQty);
+
+                // 컨트롤 추가 순서 변경
+                itemPanel.Controls.Add(nameLabel); // Fill 속성인 라벨을 먼저 추가
+                itemPanel.Controls.Add(pic);
+                itemPanel.Controls.Add(btnRemove);
+                itemPanel.Controls.Add(qtyPanel);
+
+                // 삭제 버튼을 최상위로
+                btnRemove.BringToFront();
+
+                flp_Cart.Controls.Add(itemPanel);
+            }
+        }
+
+        // ... (InitializePage, LoadAndPrepareData 등 이하 모든 코드는 이전과 동일)
 
         public async void InitializePage(OrderType orderType, long orderId)
         {
@@ -192,6 +245,42 @@ namespace User_Kiosk_Program
                 flp_Menu_Board = newPanel;
                 UpdatePageInfo();
             }
+        }
+        private void Flp_Cart_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                isTouching = true;
+                touchStartPoint = e.Location;
+                startScrollOffset = flp_Cart.HorizontalScroll.Value;
+                flp_Cart.Cursor = Cursors.Hand;
+            }
+        }
+
+        private void Flp_Cart_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isTouching)
+            {
+                int deltaX = e.X - touchStartPoint.X;
+                flp_Cart.HorizontalScroll.Value = Math.Max(0, Math.Min(flp_Cart.HorizontalScroll.Maximum, startScrollOffset - deltaX));
+            }
+        }
+
+        private void Flp_Cart_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                isTouching = false;
+                flp_Cart.Cursor = Cursors.Default;
+            }
+        }
+    }
+    public class ProductSelectedEventArgs : EventArgs
+    {
+        public Product SelectedProduct { get; }
+        public ProductSelectedEventArgs(Product product)
+        {
+            SelectedProduct = product;
         }
     }
 }

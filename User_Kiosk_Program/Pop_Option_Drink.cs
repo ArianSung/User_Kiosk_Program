@@ -7,7 +7,7 @@ namespace User_Kiosk_Program
 {
     public partial class Pop_Option_Drink : UserControl
     {
-        public event EventHandler ConfirmClicked;
+        public event EventHandler<OrderItemEventArgs> ConfirmClicked;
         public event EventHandler CancelClicked;
 
         private Product currentProduct;
@@ -37,20 +37,21 @@ namespace User_Kiosk_Program
 
         private void Btn_Confirm_Click(object sender, EventArgs e)
         {
-            // 모든 필수 옵션 그룹이 선택되었는지 확인
+            // 필수 옵션 검사
             foreach (var group in currentProduct.OptionGroups)
             {
                 if (group.IsRequired && !selectedOptions.ContainsKey(group.GroupId))
                 {
-                    MessageBox.Show($"'{group.GroupName}'은(는) 필수 선택 항목입니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return; // 필수 옵션이 선택되지 않았으므로 여기서 함수 종료
+                    MessageBox.Show($"'{group.GroupName}'은(는) 필수 선택 항목입니다.", "알림");
+                    return;
                 }
             }
 
-            // TODO: 선택된 옵션들을 장바구니에 담는 로직 추가
+            // 선택된 상품과 옵션들로 OrderItem 객체 생성
+            var orderItem = new OrderItem(currentProduct, selectedOptions);
 
-            // 모든 검사를 통과했으면 ConfirmClicked 이벤트를 발생시켜 팝업을 닫음
-            ConfirmClicked?.Invoke(this, EventArgs.Empty);
+            // OrderItem 객체를 담아 이벤트 발생
+            ConfirmClicked?.Invoke(this, new OrderItemEventArgs(orderItem));
         }
 
         private void GenerateDynamicControls(List<OptionGroup> optionGroups)
@@ -89,7 +90,6 @@ namespace User_Kiosk_Program
 
                 foreach (var option in group.Options)
                 {
-                    // ▼▼▼▼▼ 가격 표시 로직 수정 ▼▼▼▼▼
                     string priceText = "";
                     if (option.AdditionalPrice > 0)
                     {
@@ -109,7 +109,6 @@ namespace User_Kiosk_Program
                         Font = new Font("맑은 고딕", 9F),
                         Tag = option
                     };
-                    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
                     StyleAndWireButton(btnOption, group);
                     buttonsPanel.Controls.Add(btnOption);
@@ -144,6 +143,14 @@ namespace User_Kiosk_Program
                 // 선택된 옵션을 Dictionary에 저장 (그룹 ID를 키로 사용)
                 selectedOptions[group.GroupId] = clickedOption;
             };
+        }
+    }
+    public class OrderItemEventArgs : EventArgs
+    {
+        public OrderItem Item { get; }
+        public OrderItemEventArgs(OrderItem item)
+        {
+            Item = item;
         }
     }
 }

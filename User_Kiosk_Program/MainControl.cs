@@ -77,8 +77,17 @@ namespace User_Kiosk_Program
             optionPopup = new Pop_Option_Drink { Visible = false, Size = new Size(600, 720), Location = new Point((this.Width - 600) / 2, (this.Height - 720) / 2), Anchor = AnchorStyles.None };
             this.Controls.Add(optionPopup);
 
-            optionPopup.ConfirmClicked += (s, e) => HideOptionPopup();
+            optionPopup.ConfirmClicked += OptionPopup_ConfirmClicked;
             optionPopup.CancelClicked += (s, e) => HideOptionPopup();
+        }
+
+        private void OptionPopup_ConfirmClicked(object? sender, OrderItemEventArgs e)
+        {
+            // Page_Main의 장바구니에 아이템 추가
+            pageMain.AddItemToCart(e.Item);
+
+            // 팝업 닫기
+            HideOptionPopup();
         }
 
         private void ShowOptionPopup(Product product)
