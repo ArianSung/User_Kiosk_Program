@@ -125,6 +125,38 @@ namespace User_Kiosk_Program
             return image;
         }
 
+        public Color GetSystemColor(string colorKey)
+        {
+            // 기본 색상을 흰색으로 설정
+            Color color = Color.White;
+            string colorHex = null;
+            string query = "SELECT color_value FROM system_colors WHERE color_key = @key";
+
+            using (var conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@key", colorKey);
+                        object result = cmd.ExecuteScalar();
+                        if (result != null)
+                        {
+                            colorHex = result.ToString();
+                            // ColorTranslator를 사용하여 HEX 코드(#FFFFFF)를 Color 객체로 변환합니다.
+                            color = ColorTranslator.FromHtml(colorHex);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"시스템 색상 로딩 오류 (Key: {colorKey}): {ex.Message}");
+                }
+            }
+            return color;
+        }
+
         public List<Category> GetCategories()
         {
             var categories = new List<Category>();

@@ -17,6 +17,8 @@ namespace User_Kiosk_Program
         private Page_Main pageMain;
         private Page_Payment pagePayment;
         private Image appLogo;
+        private Color mainThemeColor;
+        private Color panelBackgroundColor;
 
         private Pop_Option_Drink optionPopup;
 
@@ -79,19 +81,37 @@ namespace User_Kiosk_Program
             pageMain.ProductSelected += OnProductSelected;
             pageMain.ProceedToPaymentClicked += OnProceedToPaymentClicked; // OnProceedToPaymentClicked로 수정
             pagePayment.BackButtonClicked += PagePayment_BackButtonClicked;
+            pageMain.HomeButtonClicked += (s, e) => ShowPage(pageSelectStage);
 
             optionPopup.ConfirmClicked += OptionPopup_ConfirmClicked;
             optionPopup.CancelClicked += (s, e) => HideOptionPopup();
 
-            await Task.WhenAll(LoadSharedResourcesAsync(), LoadDefaultPageData(), LoadMainPageData());
+            await Task.WhenAll(LoadThemeColorsAsync(), LoadSharedResourcesAsync(), LoadDefaultPageData(), LoadMainPageData());
 
             ApplyLogosToPages();
+            ApplyThemeToPages();
             pageMain.SetInitialData(preloadedCategories, preloadedProducts);
             pageDefault.StartAds(preloadedAdImages); // 올바른 변수 이름으로 수정
 
             ShowPage(pageDefault);
             this.Cursor = Cursors.Default;
         }
+
+        private async Task LoadThemeColorsAsync()
+        {
+            mainThemeColor = await Task.Run(() => DatabaseManager.Instance.GetSystemColor("main_theme_color"));
+            panelBackgroundColor = await Task.Run(() => DatabaseManager.Instance.GetSystemColor("panel_background_color"));
+        }
+        private void ApplyThemeToPages()
+        {
+            // 각 페이지에 만들어 둘 SetTheme 메서드를 호출
+            pageMain.SetTheme(mainThemeColor, panelBackgroundColor);
+            pagePayment.SetTheme(mainThemeColor, panelBackgroundColor);
+            pageSelectStage.SetTheme(mainThemeColor, panelBackgroundColor);
+            //pageSelectStage.SetTheme(mainThemeColor, panelBackgroundColor);
+            // ... 다른 페이지들도 동일하게 추가 ...
+        }
+
 
         private void PagePayment_BackButtonClicked(object? sender, CartEventArgs e)
         {

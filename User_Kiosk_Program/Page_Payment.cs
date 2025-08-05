@@ -102,25 +102,45 @@ namespace User_Kiosk_Program
             Button btnRemove = new Button { Text = "X", Size = new Size(24, 24), Location = new Point(mainPanel.Width - 30, 5), BackColor = Color.LightCoral, ForeColor = Color.White, FlatStyle = FlatStyle.Flat };
             btnRemove.FlatAppearance.BorderSize = 0;
             mainPanel.Controls.AddRange(new Control[] { picProduct, lblProductName, lblOptions, btnMinus, lblQuantity, btnPlus, lblPrice, btnRemove });
+            
+            // 이벤트 핸들러 연결
             btnPlus.Click += (s, e) =>
             {
+                // ▼▼▼▼▼ 1. 현재 스크롤 위치 저장 ▼▼▼▼▼
+                int scrollPosition = flp_Payment_Cart.VerticalScroll.Value;
+
                 item.Quantity++;
                 this.orderAmount = currentCart.Sum(i => i.TotalPrice);
                 RenderCartItems();
                 UpdatePaymentSummary();
+                
+                /* 병합 과정에서 충돌
+                // ▼▼▼▼▼ 2. 저장했던 스크롤 위치로 복원 ▼▼▼▼▼
+                flp_Payment_Cart.VerticalScroll.Value = scrollPosition;
+                flp_Payment_Cart.PerformLayout(); // 레이아웃을 즉시 업데이트하여 스크롤 위치 적용
+                */
             };
             btnMinus.Click += (s, e) =>
             {
                 if (item.Quantity > 1)
                 {
+                    // ▼▼▼▼▼ 1. 현재 스크롤 위치 저장 ▼▼▼▼▼
+                    int scrollPosition = flp_Payment_Cart.VerticalScroll.Value;
+
                     item.Quantity--;
                     this.orderAmount = currentCart.Sum(i => i.TotalPrice);
                     RenderCartItems();
                     UpdatePaymentSummary();
+
+                    // ▼▼▼▼▼ 2. 저장했던 스크롤 위치로 복원 ▼▼▼▼▼
+                    flp_Payment_Cart.VerticalScroll.Value = scrollPosition;
+                    flp_Payment_Cart.PerformLayout();
                 }
             };
             btnRemove.Click += (s, e) =>
             {
+                // 삭제 시에는 목록이 바뀌므로 스크롤을 맨 위로 올리는 것이 자연스러울 수 있습니다.
+                // 만약 삭제 시에도 위치를 유지하고 싶다면 위와 동일한 로직을 추가하면 됩니다.
                 currentCart.Remove(item);
                 this.orderAmount = currentCart.Sum(i => i.TotalPrice);
                 RenderCartItems();
@@ -177,6 +197,19 @@ namespace User_Kiosk_Program
             await Task.WhenAll(imageLoadTasks);
         }
 
+        /* 병합과정에서 겹침
+        // 테마세팅
+        public void SetTheme(Color mainColor, Color panelColor)
+        {
+
+            //btn_GotoPay.BackColor = mainColor;
+
+            this.BackColor = panelColor;
+        }
+        
+        private void label1_Click(object sender, EventArgs e)
+        */
+        
         // 결제 방식 PictureBox를 클릭했을 때 호출되는 이벤트 핸들러
         private void PaymentMethod_Click(object sender, EventArgs e)
         {

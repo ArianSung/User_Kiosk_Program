@@ -11,6 +11,7 @@ namespace User_Kiosk_Program
     {
         public event EventHandler<CartEventArgs> ProceedToPaymentClicked;
         public event EventHandler<ProductSelectedEventArgs> ProductSelected;
+        public event EventHandler HomeButtonClicked;
 
         private List<OrderItem> shoppingCart = new List<OrderItem>();
         private List<Category> categories;
@@ -38,6 +39,7 @@ namespace User_Kiosk_Program
             flp_Cart.MouseDown += Flp_Cart_MouseDown;
             flp_Cart.MouseMove += Flp_Cart_MouseMove;
             flp_Cart.MouseUp += Flp_Cart_MouseUp;
+            btn_Home.Click += (s, e) => HomeButtonClicked?.Invoke(this, EventArgs.Empty);
         }
 
         private void Btn_GotoPay_Click(object? sender, EventArgs e)
@@ -83,7 +85,7 @@ namespace User_Kiosk_Program
             if (categories == null) return;
             foreach (var category in categories)
             {
-                var btn = new Button { Text = string.IsNullOrEmpty(category.CategoryName) ? "이름없음" : category.CategoryName, Tag = category.CategoryId, Size = new Size(110, 60), Margin = new Padding(5) };
+                var btn = new Button { Text = string.IsNullOrEmpty(category.CategoryName) ? "이름없음" : category.CategoryName, Tag = category.CategoryId, Size = new Size(110, 60), Margin = new Padding(5), BackColor = Color.White };
                 btn.Click += CategoryButton_Click;
                 flp_Categories.Controls.Add(btn);
             }
@@ -310,6 +312,21 @@ namespace User_Kiosk_Program
             {
                 pb_Logo.Image = ImageHelper.ResizeImage(logoImage, pb_Logo.Size);
             }
+        }
+
+
+        // 테마세팅
+        public void SetTheme(Color mainColor, Color panelColor)
+        {
+            btn_Next.BackColor = Color.White;
+            btn_Prev.BackColor = Color.White;
+
+            btn_GotoPay.FlatStyle = FlatStyle.Flat;
+            btn_GotoPay.FlatAppearance.BorderSize = 0;
+            btn_GotoPay.BackColor = Color.White;
+
+
+            this.BackColor = panelColor;
         }
 
 
