@@ -16,3 +16,4 @@ namespace User_Kiosk_Program
         public Image PaymentImage { get; set; } // URL을 통해 로드된 최종 이미지를 저장할 속성
     }
 }
+// 1
