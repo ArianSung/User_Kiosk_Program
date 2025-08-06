@@ -52,7 +52,7 @@
             // 
             // btn_Confirm
             // 
-            btn_Confirm.Location = new Point(302, 544);
+            btn_Confirm.Location = new Point(309, 615);
             btn_Confirm.Name = "btn_Confirm";
             btn_Confirm.Size = new Size(122, 52);
             btn_Confirm.TabIndex = 0;
@@ -61,16 +61,16 @@
             // 
             // btn_Cancel
             // 
-            btn_Cancel.Location = new Point(172, 544);
+            btn_Cancel.Location = new Point(170, 615);
             btn_Cancel.Name = "btn_Cancel";
-            btn_Cancel.Size = new Size(124, 52);
+            btn_Cancel.Size = new Size(122, 52);
             btn_Cancel.TabIndex = 0;
             btn_Cancel.Text = "취소";
             btn_Cancel.UseVisualStyleBackColor = true;
             // 
             // btn_Search
             // 
-            btn_Search.Location = new Point(302, 544);
+            btn_Search.Location = new Point(309, 615);
             btn_Search.Name = "btn_Search";
             btn_Search.Size = new Size(122, 52);
             btn_Search.TabIndex = 0;
@@ -79,7 +79,7 @@
             // 
             // btn_UseAll
             // 
-            btn_UseAll.Location = new Point(365, 152);
+            btn_UseAll.Location = new Point(372, 223);
             btn_UseAll.Name = "btn_UseAll";
             btn_UseAll.Size = new Size(59, 33);
             btn_UseAll.TabIndex = 0;
@@ -89,7 +89,7 @@
             // btn_Num1
             // 
             btn_Num1.Font = new Font("맑은 고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            btn_Num1.Location = new Point(172, 200);
+            btn_Num1.Location = new Point(170, 271);
             btn_Num1.Name = "btn_Num1";
             btn_Num1.Size = new Size(80, 80);
             btn_Num1.TabIndex = 1;
@@ -99,7 +99,7 @@
             // btn_Num2
             // 
             btn_Num2.Font = new Font("맑은 고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            btn_Num2.Location = new Point(258, 200);
+            btn_Num2.Location = new Point(260, 271);
             btn_Num2.Name = "btn_Num2";
             btn_Num2.Size = new Size(80, 80);
             btn_Num2.TabIndex = 1;
@@ -109,7 +109,7 @@
             // btn_Num3
             // 
             btn_Num3.Font = new Font("맑은 고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            btn_Num3.Location = new Point(344, 200);
+            btn_Num3.Location = new Point(351, 271);
             btn_Num3.Name = "btn_Num3";
             btn_Num3.Size = new Size(80, 80);
             btn_Num3.TabIndex = 1;
@@ -119,7 +119,7 @@
             // btn_Num4
             // 
             btn_Num4.Font = new Font("맑은 고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            btn_Num4.Location = new Point(172, 286);
+            btn_Num4.Location = new Point(170, 357);
             btn_Num4.Name = "btn_Num4";
             btn_Num4.Size = new Size(80, 80);
             btn_Num4.TabIndex = 1;
@@ -129,7 +129,7 @@
             // btn_Num5
             // 
             btn_Num5.Font = new Font("맑은 고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            btn_Num5.Location = new Point(258, 286);
+            btn_Num5.Location = new Point(260, 357);
             btn_Num5.Name = "btn_Num5";
             btn_Num5.Size = new Size(80, 80);
             btn_Num5.TabIndex = 1;
@@ -139,7 +139,7 @@
             // btn_Num6
             // 
             btn_Num6.Font = new Font("맑은 고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            btn_Num6.Location = new Point(344, 286);
+            btn_Num6.Location = new Point(351, 357);
             btn_Num6.Name = "btn_Num6";
             btn_Num6.Size = new Size(80, 80);
             btn_Num6.TabIndex = 1;
@@ -149,7 +149,7 @@
             // btn_Num7
             // 
             btn_Num7.Font = new Font("맑은 고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            btn_Num7.Location = new Point(172, 372);
+            btn_Num7.Location = new Point(170, 443);
             btn_Num7.Name = "btn_Num7";
             btn_Num7.Size = new Size(80, 80);
             btn_Num7.TabIndex = 1;
@@ -159,7 +159,7 @@
             // btn_Num8
             // 
             btn_Num8.Font = new Font("맑은 고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            btn_Num8.Location = new Point(258, 372);
+            btn_Num8.Location = new Point(260, 443);
             btn_Num8.Name = "btn_Num8";
             btn_Num8.Size = new Size(80, 80);
             btn_Num8.TabIndex = 1;
@@ -169,7 +169,7 @@
             // btn_Num9
             // 
             btn_Num9.Font = new Font("맑은 고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            btn_Num9.Location = new Point(344, 372);
+            btn_Num9.Location = new Point(351, 443);
             btn_Num9.Name = "btn_Num9";
             btn_Num9.Size = new Size(80, 80);
             btn_Num9.TabIndex = 1;
@@ -179,7 +179,7 @@
             // btn_Clear
             // 
             btn_Clear.Font = new Font("맑은 고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            btn_Clear.Location = new Point(172, 458);
+            btn_Clear.Location = new Point(170, 529);
             btn_Clear.Name = "btn_Clear";
             btn_Clear.Size = new Size(80, 80);
             btn_Clear.TabIndex = 1;
@@ -189,7 +189,7 @@
             // btn_Num0
             // 
             btn_Num0.Font = new Font("맑은 고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            btn_Num0.Location = new Point(258, 458);
+            btn_Num0.Location = new Point(260, 529);
             btn_Num0.Name = "btn_Num0";
             btn_Num0.Size = new Size(80, 80);
             btn_Num0.TabIndex = 1;
@@ -199,7 +199,7 @@
             // btn_Backspace
             // 
             btn_Backspace.Font = new Font("맑은 고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            btn_Backspace.Location = new Point(344, 458);
+            btn_Backspace.Location = new Point(351, 529);
             btn_Backspace.Name = "btn_Backspace";
             btn_Backspace.Size = new Size(80, 80);
             btn_Backspace.TabIndex = 1;
@@ -209,17 +209,17 @@
             // txt_Input
             // 
             txt_Input.Font = new Font("맑은 고딕", 14.25F, FontStyle.Regular, GraphicsUnit.Point);
-            txt_Input.Location = new Point(172, 152);
+            txt_Input.Location = new Point(170, 223);
             txt_Input.Name = "txt_Input";
-            txt_Input.Size = new Size(187, 33);
+            txt_Input.Size = new Size(196, 33);
             txt_Input.TabIndex = 2;
             // 
             // lbl_InputGuide
             // 
             lbl_InputGuide.Font = new Font("맑은 고딕", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
-            lbl_InputGuide.Location = new Point(167, 62);
+            lbl_InputGuide.Location = new Point(0, 133);
             lbl_InputGuide.Name = "lbl_InputGuide";
-            lbl_InputGuide.Size = new Size(261, 23);
+            lbl_InputGuide.Size = new Size(600, 23);
             lbl_InputGuide.TabIndex = 3;
             lbl_InputGuide.Text = "label1";
             lbl_InputGuide.TextAlign = ContentAlignment.MiddleCenter;
@@ -227,9 +227,9 @@
             // lbl_OwnedPoints
             // 
             lbl_OwnedPoints.Font = new Font("맑은 고딕", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
-            lbl_OwnedPoints.Location = new Point(192, 85);
+            lbl_OwnedPoints.Location = new Point(0, 156);
             lbl_OwnedPoints.Name = "lbl_OwnedPoints";
-            lbl_OwnedPoints.Size = new Size(212, 23);
+            lbl_OwnedPoints.Size = new Size(600, 23);
             lbl_OwnedPoints.TabIndex = 3;
             lbl_OwnedPoints.Text = "label1";
             lbl_OwnedPoints.TextAlign = ContentAlignment.MiddleCenter;
@@ -237,9 +237,9 @@
             // lbl_RemainingPoints
             // 
             lbl_RemainingPoints.Font = new Font("맑은 고딕", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
-            lbl_RemainingPoints.Location = new Point(192, 108);
+            lbl_RemainingPoints.Location = new Point(0, 179);
             lbl_RemainingPoints.Name = "lbl_RemainingPoints";
-            lbl_RemainingPoints.Size = new Size(212, 23);
+            lbl_RemainingPoints.Size = new Size(600, 23);
             lbl_RemainingPoints.TabIndex = 3;
             lbl_RemainingPoints.Text = "label1";
             lbl_RemainingPoints.TextAlign = ContentAlignment.MiddleCenter;
