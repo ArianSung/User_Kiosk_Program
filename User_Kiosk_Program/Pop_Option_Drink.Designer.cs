@@ -87,7 +87,7 @@
             // 
             // lb_Select_Info
             // 
-            lb_Select_Info.Font = new Font("맑은 고딕", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
+            lb_Select_Info.Font = new Font("맑은 고딕", 8.00F, FontStyle.Regular, GraphicsUnit.Point);
             lb_Select_Info.Location = new Point(220, 130);
             lb_Select_Info.Name = "lb_Select_Info";
             lb_Select_Info.Size = new Size(350, 74);

@@ -129,12 +129,14 @@ namespace User_Kiosk_Program
                 nameLabel.MouseUp += Flp_Cart_MouseUp;
 
                 // ✨ 버튼 클릭 이벤트 핸들러 안에 총 금액 업데이트 호출 추가
-                btnPlus.Click += (s, e) => {
+                btnPlus.Click += (s, e) =>
+                {
                     item.Quantity++;
                     lblQty.Text = item.Quantity.ToString();
                     UpdateCartTotalPrice(); // 총 금액 업데이트
                 };
-                btnMinus.Click += (s, e) => {
+                btnMinus.Click += (s, e) =>
+                {
                     if (item.Quantity > 1)
                     {
                         item.Quantity--;
@@ -142,7 +144,8 @@ namespace User_Kiosk_Program
                         UpdateCartTotalPrice(); // 총 금액 업데이트
                     }
                 };
-                btnRemove.Click += (s, e) => {
+                btnRemove.Click += (s, e) =>
+                {
                     shoppingCart.Remove(item);
                     UpdateCartView(); // UI를 다시 그리고 총 금액도 다시 계산됨
                 };
@@ -317,17 +320,38 @@ namespace User_Kiosk_Program
 
 
         // 테마세팅
-        public void SetTheme(Color mainColor, Color panelColor)
+        public void SetTheme(Color confirmColor, Color backgroundColor, Color fontColor)     /*(Color mainColor, Color panelColor)*/
         {
-            btn_Next.BackColor = Color.White;
-            btn_Prev.BackColor = Color.White;
+            // 1. 페이지 전체 배경색을 설정합니다.
+            this.BackColor = backgroundColor;
 
+            // 2. '결제하기' 버튼의 스타일을 설정합니다.
+            btn_GotoPay.BackColor = confirmColor; // '결제하기' 버튼 배경색
+            btn_GotoPay.ForeColor = Color.White;      // 글자색은 흰색으로 고정 (또는 DB에서 가져오기)
             btn_GotoPay.FlatStyle = FlatStyle.Flat;
             btn_GotoPay.FlatAppearance.BorderSize = 0;
-            btn_GotoPay.BackColor = Color.White;
+
+            // 3. 카테고리 버튼들의 스타일도 설정할 수 있습니다.
+            foreach (Control control in flp_Categories.Controls)
+            {
+                if (control is Button btn)
+                {
+                    btn.BackColor = Color.White;
+                    btn.ForeColor = fontColor; // 기본 폰트 색 적용
+                }
+            }
+
+                // 4. 장바구니 총 금액 라벨의 글자색을 설정합니다.
+                lbl_CartTotal.ForeColor = fontColor;
+            //btn_Next.BackColor = Color.White;
+            //btn_Prev.BackColor = Color.White;
+
+            //btn_GotoPay.FlatStyle = FlatStyle.Flat;
+            //btn_GotoPay.FlatAppearance.BorderSize = 0;
+            //btn_GotoPay.BackColor = Color.White;
 
 
-            this.BackColor = panelColor;
+            //this.BackColor = panelColor;
         }
 
         public void ClearCart()
