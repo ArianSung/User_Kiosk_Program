@@ -34,9 +34,8 @@ namespace User_Kiosk_Program
         private OrderType currentOrderType;
         private System.Windows.Forms.Timer? inactivityTimer;
 
-        // ▼▼▼▼▼ 결제 과정에서 필요한 정보를 임시 저장할 필드 (pointsUsed 추가) ▼▼▼▼▼
-        private int currentFinalAmount;
-        private int currentPointsUsed; // decimal -> int
+        private decimal currentFinalAmount;
+        private int currentPointsUsed;
         private Member currentPointUser;
 
         public MainControl()
@@ -64,12 +63,12 @@ namespace User_Kiosk_Program
             pageMain = new Page_Main();
             pagePayment = new Page_Payment();
 
+            InitializePopup();
+
             this.Controls.Add(pageDefault);
             this.Controls.Add(pageSelectStage);
             this.Controls.Add(pageMain);
             this.Controls.Add(pagePayment);
-
-            InitializePopup();
             this.Controls.Add(optionPopup);
             this.Controls.Add(pointsPopup);
             this.Controls.Add(cardPopup);
@@ -117,41 +116,30 @@ namespace User_Kiosk_Program
             this.Cursor = Cursors.Default;
         }
 
-        private void OnPointPaymentClicked(object? sender, PointPaymentEventArgs e)
-        {
-            //Page_Payment로부터 받은 회원 정보를 Pop_Use_Point에 전달하기 전,
-            // Page_Payment 자체에도 최신 회원 정보를 설정해줍니다.
-            pagePayment.SetPointUser(e.PointUser);
-
-            // 팝업을 띄우기 전에, 총 주문 금액으로 팝업을 초기화합니다.
-            pointsPopup.Initialize(e.OrderAmount);
-
-            // 포인트 사용 팝업을 보여줍니다.
-            ShowPointsPopup();
-        }
-
-
-        // --- 결제 흐름 제어 메서드들 ---
         private void OnCreditCardPaymentClicked(object sender, CreditCardEventArgs e)
         {
-            this.currentFinalAmount = (int)e.FinalAmount;
-            this.currentPointsUsed = e.PointsUsed; // 이제 int를 받음
+            this.currentFinalAmount = e.FinalAmount;
+            this.currentPointsUsed = e.PointsUsed;
             this.currentPointUser = e.PointUser;
             ShowCardPopup();
         }
 
+        // ▼▼▼▼▼ 여기가 수정된 핵심 부분입니다 ▼▼▼▼▼
         private void OnCardPaymentConfirmed(object sender, EventArgs e)
         {
             HideCardPopup();
 
+            // 1. 포인트 사용 내역이 있으면 (currentPointsUsed > 0), DB에 차감 적용
             if (currentPointUser != null && currentPointsUsed > 0)
             {
-                // UpdateMemberPoints는 이제 int를 받음
+                // UpdateMemberPoints는 int형 포인트를 받으므로 -currentPointsUsed를 전달하여 차감
                 DatabaseManager.Instance.UpdateMemberPoints(currentPointUser.PhoneNumber, -currentPointsUsed);
             }
 
+            // 2. 포인트 적립 팝업 띄우기
             ShowStorePointPopup();
         }
+        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
         private void OnStorePointConfirmClicked(object sender, string phoneNumber)
         {
@@ -182,10 +170,11 @@ namespace User_Kiosk_Program
         private void ResetToDefaultPage()
         {
             pageMain.ClearCart();
+            pagePayment.SetPointUser(null);
+            pagePayment.ApplyPoints(0);
             ShowPage(pageDefault);
         }
 
-        // --- 팝업 Show/Hide 메서드들 ---
         private void ShowCardPopup() { cardPopup.BringToFront(); cardPopup.Visible = true; }
         private void HideCardPopup() { cardPopup.Visible = false; }
         private void ShowStorePointPopup() { storePointPopup.Clear(); storePointPopup.BringToFront(); storePointPopup.Visible = true; }
@@ -213,9 +202,17 @@ namespace User_Kiosk_Program
             ShowPage(pageMain);
         }
 
+        private void OnPointPaymentClicked(object sender, PointPaymentEventArgs e)
+        {
+            pagePayment.SetPointUser(e.PointUser);
+            pointsPopup.Initialize(e.OrderAmount);
+            ShowPointsPopup();
+        }
 
         private void OnPointsApplied(object sender, PointUsageEventArgs e)
         {
+            this.currentPointUser = e.Member;
+            pagePayment.SetPointUser(this.currentPointUser);
             pagePayment.ApplyPoints(e.PointsToUse);
             HidePointsPopup();
         }

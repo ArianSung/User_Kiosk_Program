@@ -148,7 +148,7 @@ namespace User_Kiosk_Program
                 return;
             }
 
-            ApplyClicked?.Invoke(this, new PointUsageEventArgs(pointsToUse));
+            ApplyClicked?.Invoke(this, new PointUsageEventArgs(pointsToUse, this.currentMember));
         }
     }
 }
