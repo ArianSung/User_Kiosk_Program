@@ -26,6 +26,8 @@ namespace User_Kiosk_Program
         private Pop_Store_Point storePointPopup;
         private Pop_New_Member newMemberPopup;
 
+        private Panel popupOverlay;
+
         private List<Category> preloadedCategories;
         private Dictionary<int, List<Product>> preloadedProducts;
         private List<Image> preloadedAdImages = new List<Image>();
@@ -74,6 +76,7 @@ namespace User_Kiosk_Program
             this.Controls.Add(cardPopup);
             this.Controls.Add(storePointPopup);
             this.Controls.Add(newMemberPopup);
+            this.Controls.Add(popupOverlay);
 
             foreach (Control page in this.Controls)
             {
@@ -124,7 +127,6 @@ namespace User_Kiosk_Program
             ShowCardPopup();
         }
 
-        // ▼▼▼▼▼ 여기가 수정된 핵심 부분입니다 ▼▼▼▼▼
         private void OnCardPaymentConfirmed(object sender, EventArgs e)
         {
             HideCardPopup();
@@ -139,7 +141,7 @@ namespace User_Kiosk_Program
             // 2. 포인트 적립 팝업 띄우기
             ShowStorePointPopup();
         }
-        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
 
         private void OnStorePointConfirmClicked(object sender, string phoneNumber)
         {
@@ -172,15 +174,47 @@ namespace User_Kiosk_Program
             pageMain.ClearCart();
             pagePayment.SetPointUser(null);
             pagePayment.ApplyPoints(0);
+            HideStorePointPopup();
             ShowPage(pageDefault);
         }
 
-        private void ShowCardPopup() { cardPopup.BringToFront(); cardPopup.Visible = true; }
-        private void HideCardPopup() { cardPopup.Visible = false; }
-        private void ShowStorePointPopup() { storePointPopup.Clear(); storePointPopup.BringToFront(); storePointPopup.Visible = true; }
-        private void HideStorePointPopup() { storePointPopup.Visible = false; }
-        private void ShowNewMemberPopup() { newMemberPopup.BringToFront(); newMemberPopup.Visible = true; }
-        private void HideNewMemberPopup() { newMemberPopup.Visible = false; }
+        private void ShowCardPopup()
+        {
+            popupOverlay.Visible = true;
+            popupOverlay.BringToFront();
+            cardPopup.Visible = true;
+            cardPopup.BringToFront();
+        }
+        private void HideCardPopup()
+        {
+            cardPopup.Visible = false;
+            popupOverlay.Visible = false;
+        }
+        private void ShowStorePointPopup()
+        {
+            storePointPopup.Clear();
+            popupOverlay.Visible = true;
+            popupOverlay.BringToFront();
+            storePointPopup.Visible = true;
+            storePointPopup.BringToFront();
+        }
+        private void HideStorePointPopup()
+        {
+            storePointPopup.Visible = false;
+            popupOverlay.Visible = false;
+        }
+        private void ShowNewMemberPopup()
+        {
+            popupOverlay.Visible = true;
+            popupOverlay.BringToFront();
+            newMemberPopup.Visible = true;
+            newMemberPopup.BringToFront();
+        }
+        private void HideNewMemberPopup()
+        {
+            newMemberPopup.Visible = false;
+            popupOverlay.Visible = false;
+        }
 
         private void OnPageSelectStageActivity(object sender, EventArgs e)
         {
@@ -217,16 +251,7 @@ namespace User_Kiosk_Program
             HidePointsPopup();
         }
 
-        private void ShowPointsPopup()
-        {
-            pointsPopup.BringToFront();
-            pointsPopup.Visible = true;
-        }
-
-        private void HidePointsPopup()
-        {
-            pointsPopup.Visible = false;
-        }
+        
 
         private async Task LoadThemeColorsAsync()
         {
@@ -249,6 +274,13 @@ namespace User_Kiosk_Program
 
         private void InitializePopup()
         {
+            popupOverlay = new TransparentPanel
+            {
+                BackColor = Color.FromArgb(128, Color.Black),
+                Dock = DockStyle.Fill,
+                Visible = false
+            };
+
             optionPopup = new Pop_Option_Drink { Visible = false, Size = new Size(600, 720), Location = new Point((this.Width - 600) / 2, (this.Height - 720) / 2), Anchor = AnchorStyles.None };
             pointsPopup = new Pop_Use_Point { Visible = false, Size = new Size(600, 850), Location = new Point((this.Width - 600) / 2, (this.Height - 850) / 2), Anchor = AnchorStyles.None };
             cardPopup = new Pop_Use_Card { Visible = false, Size = new Size(400, 250), Location = new Point((this.Width - 400) / 2, (this.Height - 250) / 2), Anchor = AnchorStyles.None };
@@ -265,13 +297,30 @@ namespace User_Kiosk_Program
         private void ShowOptionPopup(Product product)
         {
             optionPopup.SetProduct(product);
-            optionPopup.BringToFront();
+            popupOverlay.Visible = true;
+            popupOverlay.BringToFront();
             optionPopup.Visible = true;
+            optionPopup.BringToFront();
         }
 
         private void HideOptionPopup()
         {
             optionPopup.Visible = false;
+            popupOverlay.Visible = false;
+        }
+
+        private void ShowPointsPopup()
+        {
+            popupOverlay.Visible = true;
+            popupOverlay.BringToFront();
+            pointsPopup.Visible = true;
+            pointsPopup.BringToFront();
+        }
+
+        private void HidePointsPopup()
+        {
+            pointsPopup.Visible = false;
+            popupOverlay.Visible = false;
         }
 
         private async Task LoadDefaultPageData()

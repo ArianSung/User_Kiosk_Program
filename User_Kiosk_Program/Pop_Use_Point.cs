@@ -81,6 +81,10 @@ namespace User_Kiosk_Program
                 txt_Input.Text = ""; // 텍스트박스를 비워 재활용 준비
                 isPhoneNumberMode = false; // 모드를 '포인트 입력'으로 전환
                 lbl_InputGuide.Text = "사용할 포인트를 입력하세요.";
+                btn_Search.Hide();
+                btn_Confirm.Show();
+                btn_Confirm.BringToFront();
+
             }
             else
             {
@@ -88,9 +92,7 @@ namespace User_Kiosk_Program
                 lbl_OwnedPoints.Text = "보유 포인트 : 0P";
                 txt_Input.Text = "";
             }
-            btn_Search.Hide();
-            btn_Confirm.Show();
-            btn_Confirm.BringToFront();
+            
         }
 
         private void Btn_UseAll_Click(object sender, EventArgs e)
