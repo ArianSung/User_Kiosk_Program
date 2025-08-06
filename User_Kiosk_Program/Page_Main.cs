@@ -320,17 +320,38 @@ namespace User_Kiosk_Program
 
 
         // 테마세팅
-        public void SetTheme(Color mainColor, Color panelColor)
+        public void SetTheme(Color confirmColor, Color backgroundColor, Color fontColor)     /*(Color mainColor, Color panelColor)*/
         {
-            btn_Next.BackColor = Color.White;
-            btn_Prev.BackColor = Color.White;
+            // 1. 페이지 전체 배경색을 설정합니다.
+            this.BackColor = backgroundColor;
 
+            // 2. '결제하기' 버튼의 스타일을 설정합니다.
+            btn_GotoPay.BackColor = confirmColor; // '결제하기' 버튼 배경색
+            btn_GotoPay.ForeColor = Color.White;      // 글자색은 흰색으로 고정 (또는 DB에서 가져오기)
             btn_GotoPay.FlatStyle = FlatStyle.Flat;
             btn_GotoPay.FlatAppearance.BorderSize = 0;
-            btn_GotoPay.BackColor = Color.White;
+
+            // 3. 카테고리 버튼들의 스타일도 설정할 수 있습니다.
+            foreach (Control control in flp_Categories.Controls)
+            {
+                if (control is Button btn)
+                {
+                    btn.BackColor = Color.White;
+                    btn.ForeColor = fontColor; // 기본 폰트 색 적용
+                }
+            }
+
+                // 4. 장바구니 총 금액 라벨의 글자색을 설정합니다.
+                lbl_CartTotal.ForeColor = fontColor;
+            //btn_Next.BackColor = Color.White;
+            //btn_Prev.BackColor = Color.White;
+
+            //btn_GotoPay.FlatStyle = FlatStyle.Flat;
+            //btn_GotoPay.FlatAppearance.BorderSize = 0;
+            //btn_GotoPay.BackColor = Color.White;
 
 
-            this.BackColor = panelColor;
+            //this.BackColor = panelColor;
         }
 
         public void ClearCart()

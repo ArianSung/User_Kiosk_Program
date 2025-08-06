@@ -36,18 +36,18 @@
             // btn_Pay
             // 
             btn_Pay.AccessibleRole = AccessibleRole.None;
-            btn_Pay.Location = new Point(223, 172);
+            btn_Pay.Location = new Point(203, 125);
             btn_Pay.Name = "btn_Pay";
-            btn_Pay.Size = new Size(75, 23);
+            btn_Pay.Size = new Size(122, 52);
             btn_Pay.TabIndex = 0;
             btn_Pay.Text = "예";
             btn_Pay.UseVisualStyleBackColor = true;
             // 
             // btn_Cancel
             // 
-            btn_Cancel.Location = new Point(100, 172);
+            btn_Cancel.Location = new Point(75, 125);
             btn_Cancel.Name = "btn_Cancel";
-            btn_Cancel.Size = new Size(75, 23);
+            btn_Cancel.Size = new Size(122, 52);
             btn_Cancel.TabIndex = 0;
             btn_Cancel.Text = "아니오";
             btn_Cancel.UseVisualStyleBackColor = true;
@@ -55,7 +55,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(144, 101);
+            label1.Location = new Point(139, 87);
             label1.Name = "label1";
             label1.Size = new Size(109, 15);
             label1.TabIndex = 1;

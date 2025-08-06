@@ -173,12 +173,28 @@ namespace User_Kiosk_Program
                 }
             };
         }
-        public void SetTheme(Color mainColor, Color panelColor)
+        public void SetTheme(Color confirmColor, Color cancelColor, Color panelColor)        /*(Color mainColor, Color panelColor)*/
         {
-            
 
+            // 1. 팝업의 전체적인 배경색을 설정합니다.
+            this.BackColor = Color.White; // 팝업은 흰색 배경으로 유지
 
-            this.BackColor = Color.White;
+            // 2. 옵션 그룹 헤더의 배경색을 설정합니다.
+            //    (GenerateDynamicControls 메서드에서 pn_Header.BackColor = panelColor; 로 수정해도 좋습니다.)
+
+            // 3. '담기' 버튼의 스타일을 설정합니다.
+            btn_Confirm.BackColor = confirmColor;
+            btn_Confirm.ForeColor = Color.White;
+            btn_Confirm.FlatStyle = FlatStyle.Flat;
+            btn_Confirm.FlatAppearance.BorderSize = 0;
+
+            // 4. '취소' 버튼의 스타일을 설정합니다.
+            btn_Cancel.BackColor = cancelColor;
+            btn_Cancel.ForeColor = Color.White;
+            btn_Cancel.FlatStyle = FlatStyle.Flat;
+            btn_Cancel.FlatAppearance.BorderSize = 0;
+
+           // this.BackColor = Color.White;
         }
 
     }

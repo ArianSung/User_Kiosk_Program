@@ -278,19 +278,26 @@ namespace User_Kiosk_Program
         }
         private void ApplyThemeToPages()
         {
-            pageMain.SetTheme(main_theme_color, panel_background_color);
-            pagePayment.SetTheme(main_theme_color, panel_background_color);
-            pageSelectStage.SetTheme(main_theme_color, panel_background_color);
+            pageMain.SetTheme(button_confirm_color, light_background_color, main_theme_color);
+            pagePayment.SetTheme(main_theme_color, light_background_color); // pagePayment는 예시로 일부만 전달
+            pageSelectStage.SetTheme(main_theme_color, light_background_color);
+            optionPopup.SetTheme(button_confirm_color, button_danger_color, panel_background_color);
+            storePointPopup.SetTheme(button_confirm_color, button_danger_color, light_background_color);
+            pointsPopup.SetTheme(button_confirm_color, button_danger_color, light_background_color);
+            cardPopup.SetTheme(button_confirm_color, button_danger_color, light_background_color);
+            //pageMain.SetTheme(main_theme_color, panel_background_color);
+            //pagePayment.SetTheme(main_theme_color, panel_background_color);
+            //pageSelectStage.SetTheme(main_theme_color, panel_background_color);
 
-            pageMain.SetTheme(main_theme_color, panel_background_color);
-            pagePayment.SetTheme(main_theme_color, panel_background_color);
-            optionPopup.SetTheme(main_theme_color, panel_background_color);
+            //pageMain.SetTheme(main_theme_color, panel_background_color);
+            //pagePayment.SetTheme(main_theme_color, panel_background_color);
+            //optionPopup.SetTheme(main_theme_color, panel_background_color);
 
-            pageMain.SetTheme(main_theme_color, panel_background_color);
-            pagePayment.SetTheme(main_theme_color, panel_background_color);
-            pageSelectStage.SetTheme(main_theme_color, panel_background_color);
+            //pageMain.SetTheme(main_theme_color, panel_background_color);
+            //pagePayment.SetTheme(main_theme_color, panel_background_color);
+            //pageSelectStage.SetTheme(main_theme_color, panel_background_color);
 
-            pageMain.SetTheme(main_theme_color, panel_background_color);
+            //pageMain.SetTheme(main_theme_color, panel_background_color);
         }
 
         private async void OnProductSelected(object sender, ProductSelectedEventArgs e)
