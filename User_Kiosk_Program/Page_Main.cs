@@ -129,12 +129,14 @@ namespace User_Kiosk_Program
                 nameLabel.MouseUp += Flp_Cart_MouseUp;
 
                 // ✨ 버튼 클릭 이벤트 핸들러 안에 총 금액 업데이트 호출 추가
-                btnPlus.Click += (s, e) => {
+                btnPlus.Click += (s, e) =>
+                {
                     item.Quantity++;
                     lblQty.Text = item.Quantity.ToString();
                     UpdateCartTotalPrice(); // 총 금액 업데이트
                 };
-                btnMinus.Click += (s, e) => {
+                btnMinus.Click += (s, e) =>
+                {
                     if (item.Quantity > 1)
                     {
                         item.Quantity--;
@@ -142,7 +144,8 @@ namespace User_Kiosk_Program
                         UpdateCartTotalPrice(); // 총 금액 업데이트
                     }
                 };
-                btnRemove.Click += (s, e) => {
+                btnRemove.Click += (s, e) =>
+                {
                     shoppingCart.Remove(item);
                     UpdateCartView(); // UI를 다시 그리고 총 금액도 다시 계산됨
                 };

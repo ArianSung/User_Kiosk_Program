@@ -173,7 +173,14 @@ namespace User_Kiosk_Program
                 }
             };
         }
-        
+        public void SetTheme(Color mainColor, Color panelColor)
+        {
+            
+
+
+            this.BackColor = Color.White;
+        }
+
     }
     public class OrderItemEventArgs : EventArgs
     {

@@ -17,8 +17,17 @@ namespace User_Kiosk_Program
         private Page_Main pageMain;
         private Page_Payment pagePayment;
         private Image appLogo;
-        private Color mainThemeColor;
-        private Color panelBackgroundColor;
+
+        private Color accent_green_color;  // 포인트/성공 버튼 색상 (차분한 그린)
+        private Color brand_brown_color;  // 브랜드 로고 색상 (진한 갈색)
+        private Color button_confirm_color;  // 확인/담기 버튼 색상 (주황)
+        private Color button_danger_color;  // 경고/취소 버튼 색상 (부드러운 빨강)
+        private Color divider_color;  // 구분선/연한 테두리 색상 (연한 회색)
+        private Color highlight_yellow_color;  // 강조/하이라이트 색상 (버터 옐로우)
+        private Color light_background_color;  // 연한 배경 색상 (베이지)
+        private Color main_theme_color;  // 기본 폰트 색상 (진한 회색)
+        private Color panel_background_color;  // 패널 기본 배경색 (밝은 회색)
+        private Color secondary_text_color;  // 보조 텍스트 색상 (중간 회색)
 
         private Pop_Option_Drink optionPopup;
         private Pop_Use_Point pointsPopup;
@@ -255,14 +264,33 @@ namespace User_Kiosk_Program
 
         private async Task LoadThemeColorsAsync()
         {
-            mainThemeColor = await Task.Run(() => DatabaseManager.Instance.GetSystemColor("main_theme_color"));
-            panelBackgroundColor = await Task.Run(() => DatabaseManager.Instance.GetSystemColor("panel_background_color"));
+            accent_green_color = await Task.Run(() => DatabaseManager.Instance.GetSystemColor("accent_green_color"));
+            brand_brown_color = await Task.Run(() => DatabaseManager.Instance.GetSystemColor("brand_brown_color"));
+            button_confirm_color = await Task.Run(() => DatabaseManager.Instance.GetSystemColor("button_confirm_color"));
+            button_danger_color = await Task.Run(() => DatabaseManager.Instance.GetSystemColor("button_danger_color"));
+            divider_color = await Task.Run(() => DatabaseManager.Instance.GetSystemColor("divider_color"));
+            highlight_yellow_color = await Task.Run(() => DatabaseManager.Instance.GetSystemColor("highlight_yellow_color"));
+            light_background_color = await Task.Run(() => DatabaseManager.Instance.GetSystemColor("light_background_color"));
+            main_theme_color = await Task.Run(() => DatabaseManager.Instance.GetSystemColor("main_theme_color"));            
+            panel_background_color = await Task.Run(() => DatabaseManager.Instance.GetSystemColor("panel_background_color"));
+            secondary_text_color = await Task.Run(() => DatabaseManager.Instance.GetSystemColor("secondary_text_color"));
+
         }
         private void ApplyThemeToPages()
         {
-            pageMain.SetTheme(mainThemeColor, panelBackgroundColor);
-            pagePayment.SetTheme(mainThemeColor, panelBackgroundColor);
-            pageSelectStage.SetTheme(mainThemeColor, panelBackgroundColor);
+            pageMain.SetTheme(main_theme_color, panel_background_color);
+            pagePayment.SetTheme(main_theme_color, panel_background_color);
+            pageSelectStage.SetTheme(main_theme_color, panel_background_color);
+
+            pageMain.SetTheme(main_theme_color, panel_background_color);
+            pagePayment.SetTheme(main_theme_color, panel_background_color);
+            optionPopup.SetTheme(main_theme_color, panel_background_color);
+
+            pageMain.SetTheme(main_theme_color, panel_background_color);
+            pagePayment.SetTheme(main_theme_color, panel_background_color);
+            pageSelectStage.SetTheme(main_theme_color, panel_background_color);
+
+            pageMain.SetTheme(main_theme_color, panel_background_color);
         }
 
         private async void OnProductSelected(object sender, ProductSelectedEventArgs e)

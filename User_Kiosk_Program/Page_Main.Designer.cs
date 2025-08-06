@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Page_Main));
             pn_BoardContainer = new Panel();
             flp_Categories = new FlowLayoutPanel();
             flp_Cart = new FlowLayoutPanel();
@@ -125,17 +126,17 @@
             // btn_Home
             // 
             btn_Home.BackColor = Color.Transparent;
+            btn_Home.BackgroundImage = (Image)resources.GetObject("btn_Home.BackgroundImage");
+            btn_Home.BackgroundImageLayout = ImageLayout.Stretch;
             btn_Home.FlatAppearance.BorderSize = 0;
             btn_Home.FlatAppearance.MouseDownBackColor = Color.Transparent;
             btn_Home.FlatAppearance.MouseOverBackColor = Color.Transparent;
             btn_Home.FlatStyle = FlatStyle.Flat;
-            btn_Home.Font = new Font("맑은 고딕", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
             btn_Home.ForeColor = Color.White;
             btn_Home.Location = new Point(3, 3);
             btn_Home.Name = "btn_Home";
-            btn_Home.Size = new Size(70, 70);
+            btn_Home.Size = new Size(70, 65);
             btn_Home.TabIndex = 12;
-            btn_Home.Text = "HOME";
             btn_Home.UseVisualStyleBackColor = false;
             // 
             // Page_Main

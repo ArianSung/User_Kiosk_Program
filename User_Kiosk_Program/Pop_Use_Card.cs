@@ -21,5 +21,6 @@ namespace User_Kiosk_Program
             btn_Pay.Click += (s, e) => PaymentConfirmed?.Invoke(this, EventArgs.Empty);
             btn_Cancel.Click += (s, e) => CancelClicked?.Invoke(this, EventArgs.Empty);
         }
+        
     }
 }

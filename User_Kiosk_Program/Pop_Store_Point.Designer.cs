@@ -56,7 +56,7 @@
             // 
             // btn_Skip
             // 
-            btn_Skip.Location = new Point(159, 503);
+            btn_Skip.Location = new Point(164, 503);
             btn_Skip.Name = "btn_Skip";
             btn_Skip.Size = new Size(75, 23);
             btn_Skip.TabIndex = 0;
@@ -67,7 +67,7 @@
             // 
             txt_PhoneNumber.Location = new Point(164, 92);
             txt_PhoneNumber.Name = "txt_PhoneNumber";
-            txt_PhoneNumber.Size = new Size(100, 23);
+            txt_PhoneNumber.Size = new Size(251, 23);
             txt_PhoneNumber.TabIndex = 1;
             // 
             // btn_Backspace
