@@ -14,10 +14,15 @@ namespace User_Kiosk_Program
     public partial class Page_Select_Stage : UserControl
     {
         public event EventHandler<OrderTypeSelectedEventArgs> OrderTypeSelected;
+        public event EventHandler UserActivity;
 
         public Page_Select_Stage()
         {
             InitializeComponent();
+            this.MouseMove += OnUserActivity;
+            pb_WebBanner.MouseMove += OnUserActivity;
+            btn_Store.MouseMove += OnUserActivity;
+            btn_Pickup.MouseMove += OnUserActivity;
             this.DoubleBuffered = true;
 
         }
@@ -52,6 +57,11 @@ namespace User_Kiosk_Program
         {
 
             this.BackColor = panelColor;
+        }
+
+        private void OnUserActivity(object sender, MouseEventArgs e)
+        {
+            UserActivity?.Invoke(this, EventArgs.Empty);
         }
     }
 }

@@ -25,11 +25,11 @@ namespace User_Kiosk_Program
 
         private List<Category> preloadedCategories;
         private Dictionary<int, List<Product>> preloadedProducts;
-        // ▼▼▼▼▼ 오류가 발생한 변수 대신 이 변수를 사용합니다 ▼▼▼▼▼
         private List<Image> preloadedAdImages = new List<Image>();
 
         private long currentOrderId = -1;
         private OrderType currentOrderType;
+        private System.Windows.Forms.Timer? inactivityTimer;
 
 
         public MainControl()
@@ -56,7 +56,6 @@ namespace User_Kiosk_Program
             pageSelectStage = new Page_Select_Stage();
             pageMain = new Page_Main();
             pagePayment = new Page_Payment();
-            pointsPopup = new Pop_Use_Point();
 
             this.Controls.Add(pageDefault);
             this.Controls.Add(pageSelectStage);
@@ -71,23 +70,24 @@ namespace User_Kiosk_Program
             this.Controls.Add(pointsPopup);
 
             foreach (Control page in this.Controls)
-            {
-                if (page is UserControl && page != optionPopup)
-                {
-                    page.Dock = DockStyle.Fill;
-                    page.Visible = false;
-                }
-            }
+    {
+        // 페이지 컨트롤들만 Dock.Fill을 적용하고, 팝업들은 제외합니다.
+        if (page is Page_Default || page is Page_Select_Stage || page is Page_Main || page is Page_Payment)
+        {
+            page.Dock = DockStyle.Fill;
+            page.Visible = false;
+        }
+    }
 
             // 이벤트 구독
             pageDefault.ScreenClicked += OnDefaultPageScreenClicked;
             pageSelectStage.OrderTypeSelected += OnOrderTypeSelected;
             pageMain.ProductSelected += OnProductSelected;
             pageMain.ProceedToPaymentClicked += OnProceedToPaymentClicked; // OnProceedToPaymentClicked로 수정
-            pagePayment.BackButtonClicked += PagePayment_BackButtonClicked;
             pageMain.HomeButtonClicked += (s, e) => ShowPage(pageSelectStage);
             pagePayment.PointPaymentClicked += OnPayment_PointPaymentClicked;
             pagePayment.BackButtonClicked += OnPayment_BackButtonClicked;
+            pageSelectStage.UserActivity += PageSelectStage_UserActivity;
 
             optionPopup.ConfirmClicked += OptionPopup_ConfirmClicked;
             optionPopup.CancelClicked += (s, e) => HideOptionPopup();
@@ -103,6 +103,23 @@ namespace User_Kiosk_Program
 
             ShowPage(pageDefault);
             this.Cursor = Cursors.Default;
+        }
+
+        private void PageSelectStage_UserActivity(object? sender, EventArgs e)
+        {
+            // 타이머가 존재할 경우에만 리셋합니다.
+            if (inactivityTimer != null)
+            {
+                inactivityTimer.Stop();
+                inactivityTimer.Start();
+            }
+        }
+
+        private void InactivityTimer_Tick(object sender, EventArgs e)
+        {
+            // 타이머의 역할이 끝났으므로 첫 페이지로 돌아갑니다.
+            // ShowPage 메서드가 타이머를 자동으로 정리해 줄 것입니다.
+            ShowPage(pageDefault);
         }
 
         private void OnPayment_BackButtonClicked(object? sender, CartEventArgs e)
@@ -152,15 +169,6 @@ namespace User_Kiosk_Program
         }
 
 
-        private void PagePayment_BackButtonClicked(object? sender, CartEventArgs e)
-        {
-            // 1. Page_Payment로부터 받은 최신 장바구니 정보로 Page_Main을 업데이트합니다.
-            pageMain.UpdateShoppingCart(e.ShoppingCart);
-
-            // 2. Page_Main으로 돌아갑니다.
-            ShowPage(pageMain);
-        }
-
         private async void OnProductSelected(object sender, ProductSelectedEventArgs e)
         {
             var product = e.SelectedProduct;
@@ -175,7 +183,7 @@ namespace User_Kiosk_Program
             this.Controls.Add(optionPopup);
 
             // 포인트 팝업 생성 로직 추가
-            pointsPopup = new Pop_Use_Point { Visible = false, Size = new Size(600, 850), Location = new Point((this.Width - 600) / 2, (this.Height - 850) / 2), Anchor = AnchorStyles.None };
+            pointsPopup = new Pop_Use_Point { Visible = false, Size = new Size(600, 720), Location = new Point((this.Width - 600) / 2, (this.Height - 850) / 2), Anchor = AnchorStyles.None };
             this.Controls.Add(pointsPopup);
         }
 
@@ -301,10 +309,27 @@ namespace User_Kiosk_Program
 
         private void ShowPage(Control pageToShow)
         {
-            // 팝업이 아닌 페이지만 보이도록 처리
+            // 1. 만약 이전에 실행되던 타이머가 있다면, 확실하게 멈추고 메모리에서 제거합니다.
+            if (inactivityTimer != null)
+            {
+                inactivityTimer.Stop();
+                inactivityTimer.Dispose(); // 타이머 리소스 해제
+                inactivityTimer = null;
+            }
+
+            // 2. 만약 새로 보여줄 페이지가 Page_Select_Stage라면, 타이머를 새로 생성하고 시작합니다.
+            if (pageToShow == pageSelectStage)
+            {
+                inactivityTimer = new System.Windows.Forms.Timer();
+                inactivityTimer.Interval = 30000; // 30초
+                inactivityTimer.Tick += InactivityTimer_Tick;
+                inactivityTimer.Start();
+            }
+
+            // 페이지를 보여주는 로직 (기존과 동일)
             foreach (Control page in this.Controls)
             {
-                if (page is UserControl && page != optionPopup)
+                if (page is UserControl && page != optionPopup && page != pointsPopup)
                     page.Visible = (page == pageToShow);
             }
         }

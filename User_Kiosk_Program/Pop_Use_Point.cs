@@ -21,6 +21,7 @@ namespace User_Kiosk_Program
             btn_Cancel.Click += (s, e) => CancelClicked?.Invoke(this, EventArgs.Empty);
             btn_Search.Click += Btn_Search_Click;
             btn_UseAll.Click += Btn_UseAll_Click;
+            
 
             // 모든 키패드 버튼은 txt_Input에 텍스트를 추가하도록 합니다.
             btn_Num1.Click += Keypad_Click;
@@ -34,7 +35,8 @@ namespace User_Kiosk_Program
             btn_Num9.Click += Keypad_Click;
             btn_Num0.Click += Keypad_Click;
             btn_Clear.Click += (s, e) => { txt_Input.Text = ""; };
-            btn_Backspace.Click += (s, e) => {
+            btn_Backspace.Click += (s, e) =>
+            {
                 if (txt_Input.Text.Length > 0)
                     txt_Input.Text = txt_Input.Text.Substring(0, txt_Input.Text.Length - 1);
             };
@@ -55,6 +57,9 @@ namespace User_Kiosk_Program
             lbl_OwnedPoints.Text = "보유 포인트 : 0P";
             lbl_RemainingPoints.Text = "사용 후 남은 포인트 : 0P";
 
+            btn_Confirm.Hide();
+            btn_Search.Show();
+            btn_Search.BringToFront();
             txt_Input.Focus();
         }
 
@@ -83,6 +88,9 @@ namespace User_Kiosk_Program
                 lbl_OwnedPoints.Text = "보유 포인트 : 0P";
                 txt_Input.Text = "";
             }
+            btn_Search.Hide();
+            btn_Confirm.Show();
+            btn_Confirm.BringToFront();
         }
 
         private void Btn_UseAll_Click(object sender, EventArgs e)

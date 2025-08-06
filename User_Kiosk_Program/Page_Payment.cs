@@ -166,8 +166,6 @@ namespace User_Kiosk_Program
                     Tag = method,
                     Cursor = Cursors.Hand
                 };
-
-                // ▼▼▼▼▼ 변경 부분: 임시 텍스트 이미지 생성 로직을 삭제하고, URL 이미지 로드 로직만 남김 ▼▼▼▼▼
                 // DB의 payment_image 필드에 실제 URL이 있다면, 해당 URL에서 이미지를 비동기로 로드합니다.
                 if (!string.IsNullOrEmpty(method.PaymentImageUrl))
                 {
@@ -187,7 +185,6 @@ namespace User_Kiosk_Program
                         }
                     }));
                 }
-                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
                 pbox.Click += PaymentMethod_Click;
                 fl_Payments.Controls.Add(pbox);
