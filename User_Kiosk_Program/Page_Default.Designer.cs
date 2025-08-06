@@ -28,17 +28,57 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
+            adChangeTimer = new System.Windows.Forms.Timer(components);
+            pn_Show_Ad = new Panel();
+            pb_Ad = new PictureBox();
+            fade_Timer = new System.Windows.Forms.Timer(components);
+            pn_Show_Ad.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pb_Ad).BeginInit();
             SuspendLayout();
+            // 
+            // adChangeTimer
+            // 
+            adChangeTimer.Interval = 5000;
+            adChangeTimer.Tick += adChangeTimer_Tick;
+            // 
+            // pn_Show_Ad
+            // 
+            pn_Show_Ad.Controls.Add(pb_Ad);
+            pn_Show_Ad.Dock = DockStyle.Fill;
+            pn_Show_Ad.Location = new Point(0, 0);
+            pn_Show_Ad.Name = "pn_Show_Ad";
+            pn_Show_Ad.Size = new Size(720, 1020);
+            pn_Show_Ad.TabIndex = 0;
+            // 
+            // pb_Ad
+            // 
+            pb_Ad.Dock = DockStyle.Fill;
+            pb_Ad.Location = new Point(0, 0);
+            pb_Ad.Name = "pb_Ad";
+            pb_Ad.Size = new Size(720, 1020);
+            pb_Ad.SizeMode = PictureBoxSizeMode.Zoom;
+            pb_Ad.TabIndex = 0;
+            pb_Ad.TabStop = false;
+
             // 
             // Page_Default
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(pn_Show_Ad);
             Name = "Page_Default";
-            Size = new Size(600, 850);
+            Size = new Size(720, 1020);
+            pn_Show_Ad.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pb_Ad).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
+
+        private System.Windows.Forms.Timer adChangeTimer;
+        private Panel pn_Show_Ad;
+        private PictureBox pb_Ad;
+        private System.Windows.Forms.Timer fade_Timer;
     }
 }

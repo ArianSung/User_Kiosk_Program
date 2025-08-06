@@ -10,13 +10,18 @@ namespace User_Kiosk_Program
         private void User_Kiosk_Load(object sender, EventArgs e)
         {
             // DatabaseManager를 사용하여 연결을 테스트합니다.
-            bool isConnected = DatabaseManager.Instance.TestConnection();
+            //bool isConnected = DatabaseManager.Instance.TestConnection();
 
-            if (!isConnected)
-            {
-                // 데이터베이스 연결에 실패하면 프로그램을 종료하는 것이 안정적입니다.
-                Application.Exit();
-            }
+            //if (!isConnected)
+            //{
+            //    // 데이터베이스 연결에 실패하면 프로그램을 종료하는 것이 안정적입니다.
+            //    Application.Exit();
+            //}
+
+            // MainControl을 폼에 추가
+            MainControl mainControl = new MainControl();
+            mainControl.Dock = DockStyle.Fill;
+            this.Controls.Add(mainControl);
         }
     }
 }
