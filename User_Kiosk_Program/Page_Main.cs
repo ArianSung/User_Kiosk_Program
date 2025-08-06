@@ -106,7 +106,7 @@ namespace User_Kiosk_Program
             flp_Cart.Controls.Clear();
             foreach (var item in shoppingCart)
             {
-                var itemPanel = new Panel { Size = new Size(140, 150), Margin = new Padding(5), BorderStyle = BorderStyle.None, Tag = item,  };
+                var itemPanel = new Panel { Size = new Size(140, 150), Margin = new Padding(5), BorderStyle = BorderStyle.None, Tag = item, };
                 var pic = new PictureBox { Image = item.BaseProduct.ProductImage, SizeMode = PictureBoxSizeMode.Zoom, Dock = DockStyle.Top, Height = 90 };
                 var btnRemove = new Button { Text = "X", Size = new Size(20, 20), BackColor = Color.LightCoral, ForeColor = Color.White, FlatStyle = FlatStyle.Flat };
                 btnRemove.FlatAppearance.BorderSize = 0;
@@ -114,7 +114,7 @@ namespace User_Kiosk_Program
                 btnRemove.Anchor = AnchorStyles.Top | AnchorStyles.Right;
                 var nameLabel = new Label { Text = item.BaseProduct.ProductName, Dock = DockStyle.Fill, TextAlign = System.Drawing.ContentAlignment.MiddleCenter };
                 var qtyPanel = new Panel { Dock = DockStyle.Bottom, Height = 30 };
-                var btnMinus = new Button { Text = "-", Location = new Point(20,0), Width = 30, Height=30};
+                var btnMinus = new Button { Text = "-", Location = new Point(20, 0), Width = 30, Height = 30 };
                 var btnPlus = new Button { Text = "+", Location = new Point(90, 0), Width = 30, Height = 30 };
                 var lblQty = new Label { Text = item.Quantity.ToString(), Dock = DockStyle.Fill, TextAlign = System.Drawing.ContentAlignment.MiddleCenter };
 
@@ -330,8 +330,13 @@ namespace User_Kiosk_Program
             this.BackColor = panelColor;
         }
 
-
+        public void ClearCart()
+        {
+            this.shoppingCart.Clear();
+            UpdateCartView();
+        }
     }
+
     public class ProductSelectedEventArgs : EventArgs
     {
         public Product SelectedProduct { get; }

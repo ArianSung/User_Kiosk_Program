@@ -11,12 +11,14 @@ namespace User_Kiosk_Program
     public partial class Page_Payment : UserControl
     {
         public event EventHandler<CartEventArgs> BackButtonClicked;
-        public event EventHandler<decimal> PointPaymentClicked;
+        public event EventHandler<PointPaymentEventArgs> PointPaymentClicked;
+        public event EventHandler<CreditCardEventArgs> CreditCardPaymentClicked;
 
         private List<OrderItem> currentCart;
-        private decimal orderAmount = 0;
-        private decimal pointsUsed = 0;
+        private decimal orderAmount = 0; // 주문 금액은 decimal 유지
+        private int pointsUsed = 0;      // decimal -> int
         private readonly HttpClient httpClient = new HttpClient();
+        private Member pointUser = null;
 
         public Page_Payment()
         {
@@ -36,20 +38,27 @@ namespace User_Kiosk_Program
             await LoadPaymentMethodsAsync();
         }
 
+        // MainControl로부터 받은 포인트 사용 회원 정보를 저장
+        public void SetPointUser(Member member)
+        {
+            this.pointUser = member;
+        }
+
         // 결제 금액 관련 UI만 업데이트하는 메서드
         private void UpdatePaymentSummary()
         {
             this.orderAmount = currentCart.Sum(item => item.TotalPrice);
             lbl_OrderAmount.Text = $"₩ {this.orderAmount:N0}";
-            lbl_PointsUsed.Text = $"₩ {this.pointsUsed:N0}";
+            lbl_PointsUsed.Text = $"- ₩ {this.pointsUsed:N0}"; // int 값도 N0 포맷으로 표시 가능
             decimal finalAmount = this.orderAmount - this.pointsUsed;
             lbl_FinalAmount.Text = $"₩ {finalAmount:N0}";
         }
 
         // MainControl이 호출할, 포인트를 적용하는 공개 메서드
-        public void ApplyPoints(decimal pointsToUse)
+        public void ApplyPoints(int pointsToUse) // decimal -> int
         {
-            this.pointsUsed = Math.Min(this.orderAmount, pointsToUse);
+            // int와 decimal 중 작은 값을 비교하기 위해 캐스팅
+            this.pointsUsed = (int)Math.Min(this.orderAmount, pointsToUse);
             UpdatePaymentSummary();
         }
 
@@ -205,23 +214,26 @@ namespace User_Kiosk_Program
 
             this.BackColor = panelColor;
         }
-        
-        
+
+
         // 결제 방식 PictureBox를 클릭했을 때 호출되는 이벤트 핸들러
         private void PaymentMethod_Click(object sender, EventArgs e)
         {
-            var pbox = sender as PictureBox;
-            var method = pbox.Tag as PaymentMethod;
-            if (method != null)
+            var method = (sender as PictureBox).Tag as PaymentMethod;
+            if (method == null) return;
+
+            if (method.PaymentName.ToLower() == "point")
             {
-                if (method.PaymentName.ToLower() == "point")
-                {
-                    PointPaymentClicked?.Invoke(this, this.orderAmount);
-                }
-                else
-                {
-                    MessageBox.Show($"'{method.PaymentName}' 결제 방식을 선택했습니다.", "알림");
-                }
+                PointPaymentClicked?.Invoke(this, new PointPaymentEventArgs(this.orderAmount, this.pointUser));
+            }
+            else if (method.PaymentName.ToLower() == "credit_card")
+            {
+                decimal finalAmount = this.orderAmount - this.pointsUsed;
+                CreditCardPaymentClicked?.Invoke(this, new CreditCardEventArgs(finalAmount, this.pointsUsed, this.pointUser));
+            }
+            else
+            {
+                MessageBox.Show($"'{method.PaymentName}' 결제 방식을 선택했습니다.");
             }
         }
 
@@ -231,6 +243,32 @@ namespace User_Kiosk_Program
             {
                 pb_Logo.Image = ImageHelper.ResizeImage(logoImage, pb_Logo.Size);
             }
+        }
+    }
+
+    // 카드 결제 정보를 담아 보낼 EventArgs
+    public class CreditCardEventArgs : EventArgs
+    {
+        public decimal FinalAmount { get; }
+        public int PointsUsed { get; } // decimal -> int
+        public Member PointUser { get; }
+
+        public CreditCardEventArgs(decimal finalAmount, int pointsUsed, Member pointUser) // decimal -> int
+        {
+            FinalAmount = finalAmount;
+            PointsUsed = pointsUsed;
+            PointUser = pointUser;
+        }
+    }
+    public class PointPaymentEventArgs : EventArgs
+    {
+        public decimal OrderAmount { get; }
+        public Member PointUser { get; }
+
+        public PointPaymentEventArgs(decimal orderAmount, Member pointUser)
+        {
+            OrderAmount = orderAmount;
+            PointUser = pointUser;
         }
     }
 }

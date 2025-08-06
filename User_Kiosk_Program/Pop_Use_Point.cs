@@ -110,9 +110,9 @@ namespace User_Kiosk_Program
                 return;
             }
 
-            if (decimal.TryParse(txt_Input.Text, out decimal pointsToUse))
+            if (int.TryParse(txt_Input.Text, out int pointsToUse)) // decimal -> int
             {
-                decimal remaining = currentMember.Point - pointsToUse;
+                int remaining = currentMember.Point - pointsToUse; // decimal -> int
                 lbl_RemainingPoints.Text = $"사용 후 남은 포인트 : {remaining:N0}P";
             }
         }
@@ -125,9 +125,9 @@ namespace User_Kiosk_Program
                 return;
             }
 
-            if (!decimal.TryParse(txt_Input.Text, out decimal pointsToUse) || string.IsNullOrEmpty(txt_Input.Text))
+            if (!int.TryParse(txt_Input.Text, out int pointsToUse) || string.IsNullOrEmpty(txt_Input.Text)) // decimal -> int
             {
-                pointsToUse = 0; // 아무것도 입력 안하면 0으로 간주
+                pointsToUse = 0;
             }
 
             if (pointsToUse > 0 && pointsToUse < 500)

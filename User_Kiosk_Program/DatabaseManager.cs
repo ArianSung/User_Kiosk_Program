@@ -348,18 +348,54 @@ namespace User_Kiosk_Program
                                 member = new Member
                                 {
                                     PhoneNumber = reader.GetString("Phone_Number"),
-                                    Point = reader.GetDecimal("Point")
+                                    Point = reader.GetInt32("Point") // GetDecimal -> GetInt32
                                 };
                             }
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"회원 정보 조회 오류: {ex.Message}");
-                }
+                catch (Exception ex) { MessageBox.Show($"회원 정보 조회 오류: {ex.Message}"); }
             }
             return member;
+        }
+        // 특정 회원의 포인트를 업데이트하는 메서드 (차감 시에는 aomunt에 음수(-) 값을 전달)
+        public void UpdateMemberPoints(string phoneNumber, int amount) // decimal -> int
+        {
+            string query = "UPDATE members SET Point = Point + @amount WHERE Phone_Number = @phone";
+            using (var conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@amount", amount);
+                        cmd.Parameters.AddWithValue("@phone", phoneNumber);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex) { MessageBox.Show($"포인트 업데이트 오류: {ex.Message}"); }
+            }
+        }
+
+        // 신규 회원을 등록하는 메서드
+        public void CreateNewMember(string phoneNumber, int initialPoints) // decimal -> int
+        {
+            string query = "INSERT INTO members (Phone_Number, Point) VALUES (@phone, @points)";
+            using (var conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@phone", phoneNumber);
+                        cmd.Parameters.AddWithValue("@points", initialPoints);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex) { MessageBox.Show($"신규 회원 등록 오류: {ex.Message}"); }
+            }
         }
     }
 }

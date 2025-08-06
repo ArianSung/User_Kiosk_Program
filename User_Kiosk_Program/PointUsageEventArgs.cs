@@ -8,9 +8,8 @@ namespace User_Kiosk_Program
 {
     public class PointUsageEventArgs : EventArgs
     {
-        public decimal PointsToUse { get; }
-
-        public PointUsageEventArgs(decimal points)
+        public int PointsToUse { get; } // decimal -> int
+        public PointUsageEventArgs(int points) // decimal -> int
         {
             PointsToUse = points;
         }
